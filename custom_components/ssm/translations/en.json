@@ -7,8 +7,8 @@
         "description": "Set up the Swedish Radiation Safety Authority integration to monitor radiation and UV data.",
         "data": {
           "name": "Name",
-          "location_id": "Location ID for Radiation Data (e.g. 17)",
-          "location": "Location Name for UV Index (e.g. 'Sverige (Göteborg)')"
+          "location_id": "Station for Radiation Data",
+          "location": "Location Name for UV Index"
         }
       }
     },
@@ -26,10 +26,51 @@
       "init": {
         "title": "SSM Integration Options",
         "data": {
-          "location_id": "Location ID for Radiation Data",
+          "location_id": "Station for Radiation Data",
           "location": "Location Name for UV Index"
         }
       }
+    }
+  },
+  "selector": {
+    "station": {
+      "Bjuruklubb (Skellefteå)": "Bjuruklubb (Skellefteå)",
+      "Brämön": "Brämön",
+      "Fårösund": "Fårösund",
+      "Gielas (Kittelfjäll)": "Gielas (Kittelfjäll)",
+      "Gävle": "Gävle",
+      "Göteborg": "Gothenburg",
+      "Hallands Väderö": "Hallands Väderö",
+      "Hällum": "Hällum",
+      "Järnäsklubb": "Järnäsklubb",
+      "Karesuando": "Karesuando",
+      "Kilsbergen": "Kilsbergen",
+      "Krångede": "Krångede",
+      "Malmö": "Malmö",
+      "Malå": "Malå",
+      "Mora": "Mora",
+      "Norrköping": "Norrköping",
+      "Pajala": "Pajala",
+      "Ritsem": "Ritsem",
+      "Sala": "Sala",
+      "Skarpö": "Skarpö",
+      "Skillinge": "Skillinge",
+      "Storön": "Storön",
+      "Sunne": "Sunne",
+      "Tännäs": "Tännäs",
+      "Visingsö": "Visingsö",
+      "Växjö": "Växjö",
+      "Ölands Norra Udde": "Öland's Northern Cape",
+      "Ölands Södra Udde": "Öland's Southern Cape"
+    },
+    "uv_location": {
+      "Gotland": "Gotland",
+      "Göteborg": "Gothenburg",
+      "Malmö": "Malmö",
+      "Stockholm": "Stockholm",
+      "Polcirkeln": "Polar Circle",
+      "Öland": "Öland",
+      "Östersund": "Östersund"
     }
   }
 }

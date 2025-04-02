@@ -7,8 +7,8 @@
         "description": "Állítsd be a Svéd Sugárbiztonsági Hatóság integrációját a sugárzás és UV-adatok figyeléséhez.",
         "data": {
           "name": "Név",
-          "location_id": "Helyazonosító a sugárzási adatokhoz (pl. 17)",
-          "location": "Hely neve az UV-indexhez (pl. 'Sverige (Göteborg)')"
+          "location_id": "Állomás a sugárzási adatokhoz",
+          "location": "Helység az UV-indexhez"
         }
       }
     },
@@ -26,10 +26,51 @@
       "init": {
         "title": "SSM integrációs beállítások",
         "data": {
-          "location_id": "Helyazonosító a sugárzási adatokhoz",
-          "location": "Hely neve az UV-indexhez"
+          "location_id": "Állomás a sugárzási adatokhoz",
+          "location": "Helység az UV-indexhez"
         }
       }
+    }
+  },
+  "selector": {
+    "station": {
+      "Bjuruklubb (Skellefteå)": "Bjuruklubb (Skellefteå)",
+      "Brämön": "Brämön",
+      "Fårösund": "Fårösund",
+      "Gielas (Kittelfjäll)": "Gielas (Kittelfjäll)",
+      "Gävle": "Gävle",
+      "Göteborg": "Göteborg",
+      "Hallands Väderö": "Hallands Väderö",
+      "Hällum": "Hällum",
+      "Järnäsklubb": "Järnäsklubb",
+      "Karesuando": "Karesuando",
+      "Kilsbergen": "Kilsbergen",
+      "Krångede": "Krångede",
+      "Malmö": "Malmö",
+      "Malå": "Malå",
+      "Mora": "Mora",
+      "Norrköping": "Norrköping",
+      "Pajala": "Pajala",
+      "Ritsem": "Ritsem",
+      "Sala": "Sala",
+      "Skarpö": "Skarpö",
+      "Skillinge": "Skillinge",
+      "Storön": "Storön",
+      "Sunne": "Sunne",
+      "Tännäs": "Tännäs",
+      "Visingsö": "Visingsö",
+      "Växjö": "Växjö",
+      "Ölands Norra Udde": "Öland északi csücske",
+      "Ölands Södra Udde": "Ölands déli csücske"  
+    },
+    "uv_location": {
+      "Gotland": "Gotland",
+      "Göteborg": "Göteborg",
+      "Malmö": "Malmö",
+      "Stockholm": "Stockholm",
+      "Polcirkeln": "Északi sarkkör",
+      "Öland": "Öland",
+      "Östersund": "Östersund"
     }
   }
 }

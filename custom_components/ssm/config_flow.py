@@ -49,6 +49,16 @@ RADIATION_STATIONS = [
     {"id": "13", "name": "Ölands Södra Udde"},
 ]
 
+UV_LOCATIONS = [
+    {"id": "Sverige (Gotland)", "name": "Gotland"},
+    {"id": "Sverige (Göteborg)", "name": "Göteborg"},
+    {"id": "Sverige (Malmö)", "name": "Malmö"},
+    {"id": "Sverige (Stockholm)", "name": "Stockholm"},
+    {"id": "Sverige (polcirkeln)", "name": "Polcirkeln"},
+    {"id": "Sverige (Öland)", "name": "Öland"},
+    {"id": "Sverige (Östersund)", "name": "Östersund"},
+]
+
 async def validate_input(hass: HomeAssistant, data: Dict[str, Any]) -> Dict[str, Any]:
     """Validate the user input allows us to connect.
     
@@ -114,6 +124,12 @@ class SSMConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             for station in RADIATION_STATIONS
         ]
 
+        # Create dropdown options for UV locations
+        uv_location_options = [
+            {"value": loc["id"], "label": loc["name"]}
+            for loc in UV_LOCATIONS
+        ]
+
         # Provide a form for user input
         data_schema = vol.Schema(
             {
@@ -125,7 +141,13 @@ class SSMConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         mode="dropdown",
                     )
                 ),
-                vol.Required(CONF_LOCATION): str,
+                vol.Required(CONF_LOCATION): SelectSelector(
+                    SelectSelectorConfig(
+                        options=uv_location_options,
+                        translation_key="uv_location",
+                        mode="dropdown",
+                    )
+                ),
             }
         )
 
@@ -158,6 +180,12 @@ class SSMOptionsFlow(config_entries.OptionsFlow):
             for station in RADIATION_STATIONS
         ]
 
+        # Create dropdown options for UV locations
+        uv_location_options = [
+            {"value": loc["id"], "label": loc["name"]}
+            for loc in UV_LOCATIONS
+        ]
+
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema(
@@ -178,10 +206,16 @@ class SSMOptionsFlow(config_entries.OptionsFlow):
                     vol.Required(
                         CONF_LOCATION,
                         default=self.config_entry.options.get(
-                            CONF_LOCATION, 
+                            CONF_LOCATION,
                             self.config_entry.data.get(CONF_LOCATION)
                         ),
-                    ): str,
+                    ): SelectSelector(
+                        SelectSelectorConfig(
+                            options=uv_location_options,
+                            translation_key="uv_location",
+                            mode="dropdown",
+                        )
+                    ),
                 }
             ),
         )

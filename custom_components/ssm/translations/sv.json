@@ -7,8 +7,8 @@
         "description": "Ställ in Strålsäkerhetsmyndighetens integration för att övervaka gammastrålningsnivåer och UV-index.",
         "data": {
           "name": "Namn",
-          "location_id": "Plats-ID för strålningsdata (t.ex. 17)",
-          "location": "Platsnamn för UV-index (t.ex. 'Sverige (Göteborg)')"
+          "location_id": "Station för strålningsnivå",
+          "location": "Platsnamn för UV-index"
         }
       }
     },
@@ -26,10 +26,51 @@
       "init": {
         "title": "SSM-integrationsalternativ",
         "data": {
-          "location_id": "Plats-ID för strålningsdata",
+          "location_id": "Station för strålningsnivå",
           "location": "Platsnamn för UV-index"
         }
       }
+    }
+  },
+  "selector": {
+    "station": {
+      "Bjuruklubb (Skellefteå)": "Bjuruklubb (Skellefteå)",
+      "Brämön": "Brämön",
+      "Fårösund": "Fårösund",
+      "Gielas (Kittelfjäll)": "Gielas (Kittelfjäll)",
+      "Gävle": "Gävle",
+      "Göteborg": "Göteborg",
+      "Hallands Väderö": "Hallands Väderö",
+      "Hällum": "Hällum",
+      "Järnäsklubb": "Järnäsklubb",
+      "Karesuando": "Karesuando",
+      "Kilsbergen": "Kilsbergen",
+      "Krångede": "Krångede",
+      "Malmö": "Malmö",
+      "Malå": "Malå",
+      "Mora": "Mora",
+      "Norrköping": "Norrköping",
+      "Pajala": "Pajala",
+      "Ritsem": "Ritsem",
+      "Sala": "Sala",
+      "Skarpö": "Skarpö",
+      "Skillinge": "Skillinge",
+      "Storön": "Storön",
+      "Sunne": "Sunne",
+      "Tännäs": "Tännäs",
+      "Visingsö": "Visingsö",
+      "Växjö": "Växjö",
+      "Ölands Norra Udde": "Öland's Norra Udde",
+      "Ölands Södra Udde": "Öland's Södra Udde"  
+    },
+    "uv_location": {
+      "Gotland": "Gotland",
+      "Göteborg": "Göteborg",
+      "Malmö": "Malmö",
+      "Stockholm": "Stockholm",
+      "Polcirkeln": "Polcirkeln",
+      "Öland": "Öland",
+      "Östersund": "Östersund"
     }
   }
 }
