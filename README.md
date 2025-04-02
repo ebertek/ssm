@@ -11,6 +11,8 @@ This is a custom component for Home Assistant that integrates with the **Swedish
 5. Search for `ssm`, select **Swedish Radiation Safety Authority**, click **Download**, and click **Download** again
 6. Restart Home Assistant
 
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=ebertek&repository=ssm&category=Integration)
+
 ### Manual Installation  
 1. Copy the `custom_components/ssm` folder into your own `config/custom_components/`
 2. Restart Home Assistant
