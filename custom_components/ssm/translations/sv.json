@@ -13,12 +13,12 @@
       }
     },
     "error": {
-      "cannot_connect": "Misslyckades med att ansluta, försök igen",
-      "invalid_auth": "Ogiltig autentisering",
-      "unknown": "Oväntat fel"
+      "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
+      "invalid_auth": "[%key:common::config_flow::error::invalid_auth%]",
+      "unknown": "[%key:common::config_flow::error::unknown%]"
     },
     "abort": {
-      "already_configured": "Denna plats är redan konfigurerad"
+      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
     }
   },
   "options": {
