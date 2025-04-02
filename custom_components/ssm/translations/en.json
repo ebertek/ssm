@@ -1,0 +1,35 @@
+{
+  "config": {
+    "title": "Swedish Radiation Safety Authority",
+    "step": {
+      "user": {
+        "title": "Connect to SSM Data",
+        "description": "Set up the Swedish Radiation Safety Authority integration to monitor radiation and UV data.",
+        "data": {
+          "name": "Name",
+          "location_id": "Location ID for Radiation Data (e.g. 17)",
+          "location": "Location Name for UV Index (e.g. 'Sverige (Göteborg)')"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect, please try again",
+      "invalid_auth": "Invalid authentication",
+      "unknown": "Unexpected error"
+    },
+    "abort": {
+      "already_configured": "This location is already configured"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "SSM Integration Options",
+        "data": {
+          "location_id": "Location ID for Radiation Data",
+          "location": "Location Name for UV Index"
+        }
+      }
+    }
+  }
+}

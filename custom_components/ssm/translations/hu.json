@@ -1,0 +1,35 @@
+{
+  "config": {
+    "title": "Svéd Sugárbiztonsági Hatóság",
+    "step": {
+      "user": {
+        "title": "Csatlakozás az SSM adataihoz",
+        "description": "Állítsd be a Svéd Sugárbiztonsági Hatóság integrációját a sugárzás és UV-adatok figyeléséhez.",
+        "data": {
+          "name": "Név",
+          "location_id": "Helyazonosító a sugárzási adatokhoz (pl. 17)",
+          "location": "Hely neve az UV-indexhez (pl. 'Sverige (Göteborg)')"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Csatlakozási hiba, próbáld újra",
+      "invalid_auth": "Érvénytelen hitelesítés",
+      "unknown": "Váratlan hiba"
+    },
+    "abort": {
+      "already_configured": "Ez a hely már konfigurálva van"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "SSM integrációs beállítások",
+        "data": {
+          "location_id": "Helyazonosító a sugárzási adatokhoz",
+          "location": "Hely neve az UV-indexhez"
+        }
+      }
+    }
+  }
+}

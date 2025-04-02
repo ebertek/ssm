@@ -1,0 +1,35 @@
+{
+  "config": {
+    "title": "Strålsäkerhetsmyndigheten",
+    "step": {
+      "user": {
+        "title": "Anslut till SSM-data",
+        "description": "Ställ in Strålsäkerhetsmyndighetens integration för att övervaka gammastrålningsnivåer och UV-index.",
+        "data": {
+          "name": "Namn",
+          "location_id": "Plats-ID för strålningsdata (t.ex. 17)",
+          "location": "Platsnamn för UV-index (t.ex. 'Sverige (Göteborg)')"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Misslyckades med att ansluta, försök igen",
+      "invalid_auth": "Ogiltig autentisering",
+      "unknown": "Oväntat fel"
+    },
+    "abort": {
+      "already_configured": "Denna plats är redan konfigurerad"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "SSM-integrationsalternativ",
+        "data": {
+          "location_id": "Plats-ID för strålningsdata",
+          "location": "Platsnamn för UV-index"
+        }
+      }
+    }
+  }
+}
