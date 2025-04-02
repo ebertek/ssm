@@ -7,7 +7,7 @@
         "description": "Set up the Swedish Radiation Safety Authority integration to monitor radiation and UV data.",
         "data": {
           "name": "Name",
-          "location_id": "Location ID for Radiation Data (e.g. 17)",
+          "location_id": "Station for Radiation Data",
           "location": "Location Name for UV Index (e.g. 'Sverige (Göteborg)')"
         }
       }
@@ -26,7 +26,7 @@
       "init": {
         "title": "SSM Integration Options",
         "data": {
-          "location_id": "Location ID for Radiation Data",
+          "location_id": "Station for Radiation Data",
           "location": "Location Name for UV Index"
         }
       }
