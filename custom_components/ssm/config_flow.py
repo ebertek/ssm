@@ -89,7 +89,7 @@ class SSMConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             # Create translation keys for each station
             station_options.append({
                 "value": station["id"], 
-                "label": f"stations.{station['name']}"
+                "label": station["id"]  # Use the ID as the label, will be replaced by translation
             })
 
         # Create dropdown options for UV locations
@@ -98,7 +98,7 @@ class SSMConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             # Create translation keys for each UV location
             uv_location_options.append({
                 "value": loc["id"], 
-                "label": f"uv_locations.{loc['name']}"
+                "label": loc["id"]  # Use the ID as the label, will be replaced by translation
             })
 
         # Provide a form for user input
@@ -151,7 +151,7 @@ class SSMOptionsFlow(config_entries.OptionsFlow):
             # Create translation keys for each station
             station_options.append({
                 "value": station["id"], 
-                "label": f"stations.{station['name']}"
+                "label": station["id"]  # Use the ID as the label, will be replaced by translation
             })
 
         # Create dropdown options for UV locations
@@ -160,7 +160,7 @@ class SSMOptionsFlow(config_entries.OptionsFlow):
             # Create translation keys for each UV location
             uv_location_options.append({
                 "value": loc["id"], 
-                "label": f"uv_locations.{loc['name']}"
+                "label": loc["id"]  # Use the ID as the label, will be replaced by translation
             })
 
         return self.async_show_form(
