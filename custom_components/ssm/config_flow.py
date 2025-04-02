@@ -83,23 +83,17 @@ class SSMConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             except Exception:
                 errors["base"] = "cannot_connect"
 
-        # Create dropdown options for radiation stations
-        station_options = []
-        for station in RADIATION_STATIONS:
-            # Create translation keys for each station
-            station_options.append({
-                "value": station["id"], 
-                "label": station["id"]  # Use the ID as the label, will be replaced by translation
-            })
+        # Create dropdown options for location ID
+        station_options = [
+            {"value": station["id"], "label": station["name"]}
+            for station in RADIATION_STATIONS
+        ]
 
         # Create dropdown options for UV locations
-        uv_location_options = []
-        for loc in UV_LOCATIONS:
-            # Create translation keys for each UV location
-            uv_location_options.append({
-                "value": loc["id"], 
-                "label": loc["id"]  # Use the ID as the label, will be replaced by translation
-            })
+        uv_location_options = [
+            {"value": loc["id"], "label": loc["name"]}
+            for loc in UV_LOCATIONS
+        ]
 
         # Provide a form for user input
         data_schema = vol.Schema(
@@ -145,23 +139,17 @@ class SSMOptionsFlow(config_entries.OptionsFlow):
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)
 
-        # Create dropdown options for radiation stations
-        station_options = []
-        for station in RADIATION_STATIONS:
-            # Create translation keys for each station
-            station_options.append({
-                "value": station["id"], 
-                "label": station["id"]  # Use the ID as the label, will be replaced by translation
-            })
+        # Create dropdown options for location ID
+        station_options = [
+            {"value": station["id"], "label": station["name"]}
+            for station in RADIATION_STATIONS
+        ]
 
         # Create dropdown options for UV locations
-        uv_location_options = []
-        for loc in UV_LOCATIONS:
-            # Create translation keys for each UV location
-            uv_location_options.append({
-                "value": loc["id"], 
-                "label": loc["id"]  # Use the ID as the label, will be replaced by translation
-            })
+        uv_location_options = [
+            {"value": loc["id"], "label": loc["name"]}
+            for loc in UV_LOCATIONS
+        ]
 
         return self.async_show_form(
             step_id="init",

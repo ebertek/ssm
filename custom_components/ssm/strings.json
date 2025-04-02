@@ -32,50 +32,5 @@
         }
       }
     }
-  },
-  "selector": {
-    "station": {
-      "options": {
-        "20": "Bjuruklubb (Skellefteå)",
-        "5": "Brämön",
-        "7": "Fårösund",
-        "18": "Gielas (Kittelfjäll)",
-        "8": "Gävle",
-        "17": "Gothenburg",
-        "16": "Hallands Väderö",
-        "21": "Hällum",
-        "6": "Järnäsklubb",
-        "11": "Karesuando",
-        "1278": "Kilsbergen",
-        "4": "Krångede",
-        "22": "Malmö",
-        "19": "Malå",
-        "2": "Mora",
-        "1276": "Norrköping",
-        "12": "Pajala",
-        "9": "Ritsem",
-        "1": "Sala",
-        "25": "Skarpö",
-        "14": "Skillinge",
-        "10": "Storön",
-        "15": "Sunne",
-        "3": "Tännäs",
-        "24": "Visingsö",
-        "1277": "Växjö",
-        "23": "Öland's Northern Cape",
-        "13": "Öland's Southern Cape"
-      }
-    },
-    "uv_location": {
-      "options": {
-        "Sverige (Gotland)": "Gotland",
-        "Sverige (Göteborg)": "Gothenburg",
-        "Sverige (Malmö)": "Malmö",
-        "Sverige (Stockholm)": "Stockholm",
-        "Sverige (polcirkeln)": "Polar Circle",
-        "Sverige (Öland)": "Öland",
-        "Sverige (Östersund)": "Östersund"
-      }
-    }
   }
 }
