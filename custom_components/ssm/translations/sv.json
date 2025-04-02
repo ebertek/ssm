@@ -33,53 +33,43 @@
       }
     }
   },
-  "selector": {
-    "station": {
-      "options": {
-        "stations": {
-          "bjuruklubb": "Bjuruklubb (Skellefteå)",
-          "bramon": "Brämön",
-          "farosund": "Fårösund",
-          "gielas": "Gielas (Kittelfjäll)",
-          "gavle": "Gävle",
-          "goteborg": "Göteborg",
-          "hallands_vadero": "Hallands Väderö",
-          "hallum": "Hällum",
-          "jarnasklubb": "Järnäsklubb",
-          "karesuando": "Karesuando",
-          "kilsbergen": "Kilsbergen",
-          "krangede": "Krångede",
-          "malmo": "Malmö",
-          "mala": "Malå",
-          "mora": "Mora",
-          "norrkoping": "Norrköping",
-          "pajala": "Pajala",
-          "ritsem": "Ritsem",
-          "sala": "Sala",
-          "skarpo": "Skarpö",
-          "skillinge": "Skillinge",
-          "storon": "Storön",
-          "sunne": "Sunne",
-          "tannas": "Tännäs",
-          "visingo": "Visingsö",
-          "vaxjo": "Växjö",
-          "olands_norra_udde": "Ölands Norra Udde",
-          "olands_sodra_udde": "Ölands Södra Udde"
-        }
-      }
-    },
-    "uv_location": {
-      "options": {
-        "uv_locations": {
-          "gotland": "Gotland",
-          "goteborg": "Göteborg",
-          "malmo": "Malmö",
-          "stockholm": "Stockholm",
-          "polcirkeln": "Polcirkeln",
-          "oland": "Öland",
-          "ostersund": "Östersund"
-        }
-      }
-    }
+  "stations": {
+    "bjuruklubb": "Bjuruklubb (Skellefteå)",
+    "bramon": "Brämön",
+    "farosund": "Fårösund",
+    "gielas": "Gielas (Kittelfjäll)",
+    "gavle": "Gävle",
+    "goteborg": "Göteborg",
+    "hallands_vadero": "Hallands Väderö",
+    "hallum": "Hällum",
+    "jarnasklubb": "Järnäsklubb",
+    "karesuando": "Karesuando",
+    "kilsbergen": "Kilsbergen",
+    "krangede": "Krångede",
+    "malmo": "Malmö",
+    "mala": "Malå",
+    "mora": "Mora",
+    "norrkoping": "Norrköping",
+    "pajala": "Pajala",
+    "ritsem": "Ritsem",
+    "sala": "Sala",
+    "skarpo": "Skarpö",
+    "skillinge": "Skillinge",
+    "storon": "Storön",
+    "sunne": "Sunne",
+    "tannas": "Tännäs",
+    "visingo": "Visingsö",
+    "vaxjo": "Växjö",
+    "olands_norra_udde": "Ölands Norra Udde",
+    "olands_sodra_udde": "Ölands Södra Udde"
+  },
+  "uv_locations": {
+    "gotland": "Gotland",
+    "goteborg": "Göteborg",
+    "malmo": "Malmö",
+    "stockholm": "Stockholm",
+    "polcirkeln": "Polcirkeln",
+    "oland": "Öland",
+    "ostersund": "Östersund"
   }
 }
