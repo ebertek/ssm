@@ -4,7 +4,7 @@
     "step": {
       "user": {
         "title": "Csatlakozás az SSM adataihoz",
-        "description": "Állítsd be a Svéd Sugárbiztonsági Hatóság integrációját a sugárzás és UV-adatok figyeléséhez.",
+        "description": "Állítsd be a Svéd Sugárbiztonsági Hatóság integrációját a sugárzás- és UV-adatok figyeléséhez.",
         "data": {
           "name": "Név",
           "location_id": "Állomás a sugárzási adatokhoz",
@@ -25,6 +25,7 @@
     "step": {
       "init": {
         "title": "SSM integrációs beállítások",
+        "description": "Frissítsd a sugárzás- és UV-adatok figyelésének beállításait",
         "data": {
           "location_id": "Állomás a sugárzási adatokhoz",
           "location": "Helység az UV-indexhez"
@@ -34,43 +35,51 @@
   },
   "selector": {
     "station": {
-      "Bjuruklubb (Skellefteå)": "Bjuruklubb (Skellefteå)",
-      "Brämön": "Brämön",
-      "Fårösund": "Fårösund",
-      "Gielas (Kittelfjäll)": "Gielas (Kittelfjäll)",
-      "Gävle": "Gävle",
-      "Göteborg": "Göteborg",
-      "Hallands Väderö": "Hallands Väderö",
-      "Hällum": "Hällum",
-      "Järnäsklubb": "Järnäsklubb",
-      "Karesuando": "Karesuando",
-      "Kilsbergen": "Kilsbergen",
-      "Krångede": "Krångede",
-      "Malmö": "Malmö",
-      "Malå": "Malå",
-      "Mora": "Mora",
-      "Norrköping": "Norrköping",
-      "Pajala": "Pajala",
-      "Ritsem": "Ritsem",
-      "Sala": "Sala",
-      "Skarpö": "Skarpö",
-      "Skillinge": "Skillinge",
-      "Storön": "Storön",
-      "Sunne": "Sunne",
-      "Tännäs": "Tännäs",
-      "Visingsö": "Visingsö",
-      "Växjö": "Växjö",
-      "Ölands Norra Udde": "Öland északi csücske",
-      "Ölands Södra Udde": "Ölands déli csücske"  
+      "options": {
+        "stations": {
+          "bjuruklubb": "Bjuruklubb (Skellefteå)",
+          "bramon": "Brämön",
+          "farosund": "Fårösund",
+          "gielas": "Gielas (Kittelfjäll)",
+          "gavle": "Gävle",
+          "goteborg": "Göteborg",
+          "hallands_vadero": "Hallands Väderö",
+          "hallum": "Hällum",
+          "jarnasklubb": "Järnäsklubb",
+          "karesuando": "Karesuando",
+          "kilsbergen": "Kilsbergen",
+          "krangede": "Krångede",
+          "malmo": "Malmö",
+          "mala": "Malå",
+          "mora": "Mora",
+          "norrkoping": "Norrköping",
+          "pajala": "Pajala",
+          "ritsem": "Ritsem",
+          "sala": "Sala",
+          "skarpo": "Skarpö",
+          "skillinge": "Skillinge",
+          "storon": "Storön",
+          "sunne": "Sunne",
+          "tannas": "Tännäs",
+          "visingo": "Visingsö",
+          "vaxjo": "Växjö",
+          "olands_norra_udde": "Öland északi csücske",
+          "olands_sodra_udde": "Öland déli csücske"
+        }
+      }
     },
     "uv_location": {
-      "Gotland": "Gotland",
-      "Göteborg": "Göteborg",
-      "Malmö": "Malmö",
-      "Stockholm": "Stockholm",
-      "Polcirkeln": "Északi sarkkör",
-      "Öland": "Öland",
-      "Östersund": "Östersund"
+      "options": {
+        "uv_locations": {
+          "gotland": "Gotland",
+          "goteborg": "Göteborg",
+          "malmo": "Malmö",
+          "stockholm": "Stockholm",
+          "polcirkeln": "Északi sarkkör",
+          "oland": "Öland",
+          "ostersund": "Östersund"
+        }
+      }
     }
   }
 }
