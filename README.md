@@ -4,14 +4,15 @@ This is a custom component for Home Assistant that integrates with the **Swedish
 
 ## Installation
 ### HACS (Recommended)
-1. Go to **HACS > Integrations**
-2. Click on the three-dot menu (top right) and select **Custom Repositories**
-3. Add this repository: `https://github.com/ebertek/ssm`
-4. Select **Integration** as the category
-5. Install and restart Home Assistant
+1. Go to **HACS**
+2. Click on the three-dot menu (top right) and select **Custom repositories**
+3. Add this Repository: `https://github.com/ebertek/ssm`
+4. Select **Integration** as the Type
+5. Search for `ssm`, select **Swedish Radiation Safety Authority**, click **Download**, and click **Download** again
+6. Restart Home Assistant
 
 ### Manual Installation  
-1. Copy the `ssm` folder into `config/custom_components/`
+1. Copy the `custom_components/ssm` folder into your own `config/custom_components/`
 2. Restart Home Assistant
 
 ## Configuration
