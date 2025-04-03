@@ -33,13 +33,14 @@ async def async_setup_entry(
 
     uv_sensor = SSMUVIndexSensor(hass, session, name, location, entry.entry_id)
     radiation_sensor = SSMRadiationSensor(hass, session, name, location_id, entry.entry_id)
-    sun_time_sensor = SSMSunTimeSensor(hass, session, name, skintype, entry.entry_id, uv_sensor.entity_id)
     sensors = [
         uv_sensor,
         radiation_sensor,
-        sun_time_sensor
     ]
     async_add_entities(sensors, True)
+
+    sun_time_sensor = SSMSunTimeSensor(hass, session, name, skintype, uv_sensor, entry.entry_id)
+    async_add_entities([sun_time_sensor])
 
 class SSMRadiationSensor(SensorEntity):
     """Representation of a SSM Radiation Sensor."""
@@ -260,14 +261,14 @@ class SSMSunTimeSensor(SensorEntity):
     _attr_native_unit_of_measurement = "minutes"
     _attr_icon = "mdi:weather-sunny"
 
-    def __init__(self, hass, session, name, skintype, entry_id, uv_entity_id):
+    def __init__(self, hass, session, name, skintype, uv_sensor, entry_id):
         """Initialize the sensor."""
         self.hass = hass
         self._session = session
         self._attr_name = "Min soltid"
         self._skintype = skintype
+        self._uv_sensor = uv_sensor
         self._entry_id = entry_id
-        self._uv_entity_id = uv_entity_id  # Store UV entity ID
 
         self._attr_unique_id = f"{entry_id}_sun_time"
         self._attr_native_value = None
@@ -291,7 +292,8 @@ class SSMSunTimeSensor(SensorEntity):
         """Get the latest data from the API and update the state."""
         try:
             # Get the latest UV index from the UV sensor
-            uv_state = self.hass.states.get(self._uv_entity_id)
+            uv_entity_id = self._uv_sensor.entity_id
+            uv_state = self.hass.states.get(uv_entity_id)
             if not uv_state or uv_state.state in (None, "unknown", "unavailable"):
                 _LOGGER.warning("UV Index sensor state is unavailable or invalid, skipping Min Soltid update")
                 self._attr_available = False
@@ -346,5 +348,5 @@ class SSMSunTimeSensor(SensorEntity):
                     _LOGGER.error("Failed to fetch sun time data: %s", response.status)
                     self._attr_available = False
         except Exception as e:
-            _LOGGER.error("Error updating Min Soltid sensor: %s", e)
+            _LOGGER.error("Error updating Min Soltid sensor: %s", e, exc_info=True)
             self._attr_available = False
