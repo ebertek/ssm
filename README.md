@@ -20,9 +20,10 @@ This is a custom component for Home Assistant that integrates with the **Swedish
 ## Configuration
 1. Navigate to **Settings > Devices & services**
 2. Click **Add integration** and search for `Swedish Radiation Safety Authority`
-3. Select your **Station for Radiation Data** and enter your **Location Name for UV Index**
+3. Select your **Station for Radiation Data**, enter your **Location Name for UV Index**, and enter your **Skin Type**
     1. To find your closest gamma radiation station, navigate to [SSM's radiation level site](https://karttjanst.ssm.se/gammastationer) or [REMon's radiological map](https://remap.jrc.ec.europa.eu/Advanced.aspx). You can find a mapping of location IDs, station names, and REMon IDs in the table below.
     2. To find your **Location Name for UV Index**, navigate to [SSM's UV-index site](https://www.stralsakerhetsmyndigheten.se/omraden/sol-och-solarier/uv-index/) and look under **Plats**.
+    3. To find your **Skin Type**, please refer to **Solkänslighet** on [SSM's Min soltid site](https://www.minsoltid.se/).
 
 | Location ID |         Station         | REMon ID |
 | ----------- | ----------------------- | -------- |
