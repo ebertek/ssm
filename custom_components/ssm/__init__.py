@@ -12,8 +12,6 @@ from .const import (
     CONF_LOCATION,
     CONF_SKIN_TYPE,
     DEFAULT_NAME,
-    RADIATION_STATIONS,
-    UV_LOCATIONS,
 )
 
 _LOGGER = logging.getLogger(__name__)
