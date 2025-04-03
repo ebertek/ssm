@@ -95,22 +95,44 @@
       "min_soltid": {
         "name": "Napon tölthető idő",
         "state_attributes": {
-          "shade_direct_sun": "Közvetlen napfényben",
-          "shade_partial": "Részleges árnyékban",
-          "shade_full": "Teljes árnyékban",
-          "last_updated": "Utoljára frissítve"
+          "shade_direct_sun": {
+            "name": "Közvetlen napfényben"
+          },
+          "shade_partial": {
+            "name": "Részleges árnyékban"
+          },
+          "shade_full": {
+            "name": "Teljes árnyékban"
+          },
+          "last_updated": {
+            "name": "Utoljára frissítve"
+          }
         }
       },
       "uv_index": {
         "name": "UV-index",
         "state_attributes": {
-          "current_uv": "Jelenlegi UV-index",
-          "max_uv_today": "Mai UV-index",
-          "max_uv_time": "Legmagasabb UV-index időpontja",
-          "max_uv_tomorrow": "Holnapi UV-index",
-          "hourly_forecast": "Előjelzés",
-          "risk_level": "Veszélyességi szint",
-          "last_updated": "Utoljára frissítve"
+          "current_uv": {
+            "name": "Jelenlegi UV-index"
+          },
+          "max_uv_today": {
+            "name": "Mai UV-index"
+          },
+          "max_uv_time": {
+            "name": "Legmagasabb UV-index időpontja"
+          },
+          "max_uv_tomorrow": {
+            "name": "Holnapi UV-index"
+          },
+          "hourly_forecast": {
+            "name": "Előjelzés"
+          },
+          "risk_level": {
+            "name": "Veszélyességi szint"
+          },
+          "last_updated": {
+            "name": "Utoljára frissítve"
+          }
         },
         "state": {
           "extreme": "Extrém",
@@ -124,11 +146,21 @@
       "radiation_level": {
         "name": "Sugárzásszint",
         "state_attributes": {
-          "min_level": "Legalacsonyabb szint",
-          "max_level": "Legmagasabb szint",
-          "avg_level": "Átlagos szint",
-          "last_updated": "Utoljára frissítve",
-          "raw_data": "Nyers adatok"
+          "min_level": {
+            "name": "Legalacsonyabb szint"
+          },
+          "max_level": {
+            "name": "Legmagasabb szint"
+          },
+          "avg_level": {
+            "name": "Átlagos szint"
+          },
+          "last_updated": {
+            "name": "Utoljára frissítve"
+          },
+          "raw_data": {
+            "name": "Nyers adatok"
+          }
         }
       }
     }

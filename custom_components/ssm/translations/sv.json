@@ -95,22 +95,44 @@
       "min_soltid": {
         "name": "Min soltid",
         "state_attributes": {
-          "shade_direct_sun": "I direkt solljus",
-          "shade_partial": "I lite skugga",
-          "shade_full": "I mycket skugga",
-          "last_updated": "Senast uppdaterad"
+          "shade_direct_sun": {
+            "name": "I direkt solljus"
+          },
+          "shade_partial": {
+            "name": "I lite skugga"
+          },
+          "shade_full": {
+            "name": "I mycket skugga"
+          },
+          "last_updated": {
+            "name": "Senast uppdaterad"
+          }
         }
       },
       "uv_index": {
         "name": "UV-index",
         "state_attributes": {
-          "current_uv": "UV-index nu",
-          "max_uv_today": "UV-index idag",
-          "max_uv_time": "Tid för högsta UV-index",
-          "max_uv_tomorrow": "Maximal UV-index imorgon",
-          "hourly_forecast": "Prognos",
-          "risk_level": "Risknivå",
-          "last_updated": "Senast uppdaterad"
+          "current_uv": {
+            "name": "UV-index nu"
+          },
+          "max_uv_today": {
+            "name": "UV-index idag"
+          },
+          "max_uv_time": {
+            "name": "Tid för högsta UV-index"
+          },
+          "max_uv_tomorrow": {
+            "name": "Maximal UV-index imorgon"
+          },
+          "hourly_forecast": {
+            "name": "Prognos"
+          },
+          "risk_level": {
+            "name": "Risknivå"
+          },
+          "last_updated": {
+            "name": "Senast uppdaterad"
+          }
         },
         "state": {
           "extreme": "Extremt",
@@ -124,11 +146,21 @@
       "radiation_level": {
         "name": "Strålningsnivå",
         "state_attributes": {
-          "min_level": "Minsta nivå",
-          "max_level": "Maximal nivå",
-          "avg_level": "Genomsnittlig nivå",
-          "last_updated": "Senast uppdaterad",
-          "raw_data": "Rådata"
+          "min_level": {
+            "name": "Minsta nivå"
+          },
+          "max_level": {
+            "name": "Maximal nivå"
+          },
+          "avg_level": {
+            "name": "Genomsnittlig nivå"
+          },
+          "last_updated": {
+            "name": "Senast uppdaterad"
+          },
+          "raw_data": {
+            "name": "Rådata"
+          }
         }
       }
     }

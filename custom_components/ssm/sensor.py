@@ -72,13 +72,6 @@ class SSMRadiationSensor(SensorEntity):
             "last_updated": None,
             "raw_data": [],
         }
-        self._attr_extra_attribute_translation_keys = {
-            "min_level": "min_level",
-            "max_level": "max_level",
-            "avg_level": "avg_level",
-            "last_updated": "last_updated",
-            "raw_data": "raw_data",
-        }
 
         # Define device info
         self._attr_device_info = DeviceInfo(
@@ -153,15 +146,6 @@ class SSMUVIndexSensor(SensorEntity):
             "hourly_forecast": [],
             "risk_level": None,
             "last_updated": None,
-        }
-        self._attr_extra_attribute_translation_keys = {
-            "current_uv": "current_uv",
-            "max_uv_today": "max_uv_today",
-            "max_uv_time": "max_uv_time",
-            "max_uv_tomorrow": "max_uv_tomorrow",
-            "hourly_forecast": "hourly_forecast",
-            "risk_level": "risk_level",
-            "last_updated": "last_updated",
         }
 
         # Define device info (same as radiation sensor for grouping)
@@ -301,12 +285,6 @@ class SSMSunTimeSensor(SensorEntity):
             "shade_partial": None,
             "shade_full": None,
             "last_updated": None,
-        }
-        self._attr_extra_attribute_translation_keys = {
-            "shade_direct_sun": "shade_direct_sun",
-            "shade_partial": "shade_partial",
-            "shade_full": "shade_full",
-            "last_updated": "last_updated"
         }
 
         # Define device info

@@ -95,22 +95,44 @@
       "min_soltid": {
         "name": "My time in the sun",
         "state_attributes": {
-          "shade_direct_sun": "In direct sun",
-          "shade_partial": "In partial shade",
-          "shade_full": "In full shade",
-          "last_updated": "Last updated"
+          "shade_direct_sun": {
+            "name": "In direct sun"
+          },
+          "shade_partial": {
+            "name": "In partial shade"
+          },
+          "shade_full": {
+            "name": "In full shade"
+          },
+          "last_updated": {
+            "name": "Last updated"
+          }
         }
       },
       "uv_index": {
         "name": "UV Index",
         "state_attributes": {
-          "current_uv": "Current UV",
-          "max_uv_today": "Max UV today",
-          "max_uv_time": "Time of Peak UV",
-          "max_uv_tomorrow": "Max UV tomorrow",
-          "hourly_forecast": "Hourly forecast",
-          "risk_level": "Risk level",
-          "last_updated": "Last updated"
+          "current_uv": {
+            "name": "Current UV"
+          },
+          "max_uv_today": {
+            "name": "Max UV today"
+          },
+          "max_uv_time": {
+            "name": "Time of Peak UV"
+          },
+          "max_uv_tomorrow": {
+            "name": "Max UV tomorrow"
+          },
+          "hourly_forecast": {
+            "name": "Hourly forecast"
+          },
+          "risk_level": {
+            "name": "Risk level"
+          },
+          "last_updated": {
+            "name": "Last updated"
+          }
         },
         "state": {
           "extreme": "Extreme",
@@ -124,11 +146,21 @@
       "radiation_level": {
         "name": "Radiation Level",
         "state_attributes": {
-          "min_level": "Minimum level",
-          "max_level": "Maximum level",
-          "avg_level": "Average level",
-          "last_updated": "Last updated",
-          "raw_data": "Raw data"
+          "min_level": {
+            "name": "Minimum level"
+          },
+          "max_level": {
+            "name": "Maximum level"
+          },
+          "avg_level": {
+            "name": "Average level"
+          },
+          "last_updated": {
+            "name": "Last updated"
+          },
+          "raw_data": {
+            "name": "Raw data"
+          }
         }
       }
     }
