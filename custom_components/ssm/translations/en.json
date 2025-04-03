@@ -89,5 +89,48 @@
         "6": "Type 6 (Dark brown, never burns)"
       }
     }
+  },
+  "entity": {
+    "sensor": {
+      "min_soltid": {
+        "name": "My time in the sun",
+        "state_attributes": {
+          "shade_direct_sun": "In direct sun",
+          "shade_partial": "In partial shade",
+          "shade_full": "In full shade",
+          "last_updated": "Last updated"
+        }
+      },
+      "uv_index": {
+        "name": "UV Index",
+        "state_attributes": {
+          "current_uv": "Current UV",
+          "max_uv_today": "Max UV today",
+          "max_uv_time": "Time of Peak UV",
+          "max_uv_tomorrow": "Max UV tomorrow",
+          "hourly_forecast": "Hourly forecast",
+          "risk_level": "Risk level",
+          "last_updated": "Last updated"
+        },
+        "state": {
+          "extreme": "Extreme",
+          "very_high": "Very High",
+          "high": "High",
+          "moderate": "Moderate",
+          "low": "Low",
+          "none": "None"
+        }
+      },
+      "radiation_level": {
+        "name": "Radiation Level",
+        "state_attributes": {
+          "min_level": "Minimum level",
+          "max_level": "Maximum level",
+          "avg_level": "Average level",
+          "last_updated": "Last updated",
+          "raw_data": "Raw data"
+        }
+      }
+    }
   }
 }

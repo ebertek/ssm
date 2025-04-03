@@ -89,5 +89,48 @@
         "6": "Type 6 (Erősen pigmentált sötétbarna-fekete)"
       }
     }
+  },
+  "entity": {
+    "sensor": {
+      "min_soltid": {
+        "name": "Napon tölthető idő",
+        "state_attributes": {
+          "shade_direct_sun": "Közvetlen napfényben",
+          "shade_partial": "Részleges árnyékban",
+          "shade_full": "Teljes árnyékban",
+          "last_updated": "Utoljára frissítve"
+        }
+      },
+      "uv_index": {
+        "name": "UV-index",
+        "state_attributes": {
+          "current_uv": "Jelenlegi UV-index",
+          "max_uv_today": "Mai UV-index",
+          "max_uv_time": "Legmagasabb UV-index időpontja",
+          "max_uv_tomorrow": "Holnapi UV-index",
+          "hourly_forecast": "Előjelzés",
+          "risk_level": "Veszélyességi szint",
+          "last_updated": "Utoljára frissítve"
+        },
+        "state": {
+          "extreme": "Extrém",
+          "very_high": "Nagyon erős",
+          "high": "Erős",
+          "moderate": "Mérsékelt",
+          "low": "Gyenge",
+          "none": "Nincs"
+        }
+      },
+      "radiation_level": {
+        "name": "Sugárzásszint",
+        "state_attributes": {
+          "min_level": "Legalacsonyabb szint",
+          "max_level": "Legmagasabb szint",
+          "avg_level": "Átlagos szint",
+          "last_updated": "Utoljára frissítve",
+          "raw_data": "Nyers adatok"
+        }
+      }
+    }
   }
 }

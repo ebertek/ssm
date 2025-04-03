@@ -61,12 +61,20 @@ class SSMRadiationSensor(SensorEntity):
         self._attr_native_value = None
         self._attr_icon = "mdi:radioactive"
         self._attr_available = True
+
         self._attr_extra_state_attributes = {
             "min_level": None,
             "max_level": None,
             "avg_level": None,
             "last_updated": None,
             "raw_data": [],
+        }
+        self._attr_extra_attribute_translation_keys = {
+            "min_level": "min_level",
+            "max_level": "max_level",
+            "avg_level": "avg_level",
+            "last_updated": "last_updated",
+            "raw_data": "raw_data",
         }
 
         # Define device info
@@ -133,6 +141,7 @@ class SSMUVIndexSensor(SensorEntity):
         self._attr_unique_id = f"{entry_id}_uv_index"
         self._attr_native_value = None
         self._attr_available = True
+
         self._attr_extra_state_attributes = {
             "current_uv": None,
             "max_uv_today": None,
@@ -141,6 +150,15 @@ class SSMUVIndexSensor(SensorEntity):
             "hourly_forecast": [],
             "risk_level": None,
             "last_updated": None,
+        }
+        self._attr_extra_attribute_translation_keys = {
+            "current_uv": "current_uv",
+            "max_uv_today": "max_uv_today",
+            "max_uv_time": "max_uv_time",
+            "max_uv_tomorrow": "max_uv_tomorrow",
+            "hourly_forecast": "hourly_forecast",
+            "risk_level": "risk_level",
+            "last_updated": "last_updated",
         }
 
         # Define device info (same as radiation sensor for grouping)
@@ -154,16 +172,16 @@ class SSMUVIndexSensor(SensorEntity):
     def _get_risk_level(self, uv_index):
         """Get the UV risk level based on the index value."""
         if uv_index >= 11:
-            return "Extreme"
+            return "extreme"
         elif uv_index >= 8:
-            return "Very High"
+            return "very_high"
         elif uv_index >= 6:
-            return "High"
+            return "high"
         elif uv_index >= 3:
-            return "Moderate"
+            return "moderate"
         elif uv_index > 0:
-            return "Low"
-        return "None"
+            return "low"
+        return "none"
 
     def _get_icon(self, uv_index):
         """Get the appropriate icon based on UV index value."""
@@ -236,7 +254,8 @@ class SSMUVIndexSensor(SensorEntity):
                         self._attr_extra_state_attributes["max_uv_time"] = max_time_formatted
                         self._attr_extra_state_attributes["max_uv_tomorrow"] = max_uv_tomorrow
                         self._attr_extra_state_attributes["hourly_forecast"] = hourly_data
-                        self._attr_extra_state_attributes["risk_level"] = self._get_risk_level(max_uv_today)
+                        risk_level_key = self._get_risk_level(max_uv_today)
+                        self._attr_extra_state_attributes["risk_level"] = risk_level_key
                         self._attr_extra_state_attributes["last_updated"] = dt_util.utcnow().isoformat()
 
                         # Update icon based on current UV value
@@ -273,11 +292,18 @@ class SSMSunTimeSensor(SensorEntity):
         self._attr_unique_id = f"{entry_id}_sun_time"
         self._attr_native_value = None
         self._attr_available = True
+
         self._attr_extra_state_attributes = {
             "shade_direct_sun": None,
             "shade_partial": None,
             "shade_full": None,
             "last_updated": None,
+        }
+        self._attr_extra_attribute_translation_keys = {
+            "shade_direct_sun": "shade_direct_sun",
+            "shade_partial": "shade_partial",
+            "shade_full": "shade_full",
+            "last_updated": "last_updated"
         }
 
         # Define device info
