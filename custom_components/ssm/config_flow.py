@@ -25,13 +25,10 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 async def validate_input(hass: HomeAssistant, data: Dict[str, Any]) -> Dict[str, Any]:
-    """Validate the user input allows us to connect.
-    
-    Data has the keys from DATA_SCHEMA with values provided by the user.
-    """
+    """Validate the user input allows us to connect."""
     # Test radiation API endpoint
     session = async_get_clientsession(hass)
-    
+
     # Validate the radiation endpoint
     try:
         url = f"https://karttjanst.ssm.se/data/getHistoryForStation?locationId={data[CONF_LOCATION_ID]}&start=0&end=1"
@@ -67,7 +64,7 @@ class SSMConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_user(self, user_input: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """Handle the initial step."""
         errors = {}
-        
+
         if user_input is not None:
             try:
                 info = await validate_input(self.hass, user_input)
@@ -119,7 +116,7 @@ class SSMConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user", data_schema=data_schema, errors=errors
         )
-    
+
     @staticmethod
     @callback
     def async_get_options_flow(config_entry):

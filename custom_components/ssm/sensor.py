@@ -27,14 +27,14 @@ async def async_setup_entry(
     name = entry.data.get(CONF_NAME)
     location_id = entry.data.get(CONF_LOCATION_ID)
     location = entry.data.get(CONF_LOCATION)
-    
+
     session = async_get_clientsession(hass)
-    
+
     sensors = [
         SSMRadiationSensor(hass, session, name, location_id, entry.entry_id),
         SSMUVIndexSensor(hass, session, name, location, entry.entry_id),
     ]
-    
+
     async_add_entities(sensors, True)
 
 
@@ -52,7 +52,7 @@ class SSMRadiationSensor(SensorEntity):
         self._attr_name = "Radiation Level"
         self._location_id = location_id
         self._entry_id = entry_id
-        
+
         self._attr_unique_id = f"{entry_id}_radiation"
         self._attr_native_value = None
         self._attr_icon = "mdi:radioactive"
@@ -64,7 +64,7 @@ class SSMRadiationSensor(SensorEntity):
             "last_updated": None,
             "raw_data": [],
         }
-        
+
         # Define device info
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, entry_id)},
@@ -81,17 +81,17 @@ class SSMRadiationSensor(SensorEntity):
             start_of_day = now.replace(hour=0, minute=0, second=0, microsecond=0)
             start_timestamp = int(start_of_day.timestamp() * 1000)
             end_timestamp = int(now.timestamp() * 1000)
-            
+
             url = f"https://karttjanst.ssm.se/data/getHistoryForStation?locationId={self._location_id}&start={start_timestamp}&end={end_timestamp}"
-            
+
             async with self._session.get(url) as response:
                 if response.status == 200:
                     data = await response.json()
-                    
+
                     if "values" in data and data["values"]:
                         values = data["values"]
                         radiation_values = [item[1] for item in values]  # Extract radiation values
-                        
+
                         # Convert from μSv/h to nSv/h
                         self._attr_native_value = round(radiation_values[-1] * 1000)  # Most recent value
                         self._attr_extra_state_attributes["min_level"] = round(min(radiation_values) * 1000)
@@ -125,7 +125,7 @@ class SSMUVIndexSensor(SensorEntity):
         self._attr_name = "UV Index"
         self._location = location
         self._entry_id = entry_id
-        
+
         self._attr_unique_id = f"{entry_id}_uv_index"
         self._attr_native_value = None
         self._attr_available = True
@@ -138,7 +138,7 @@ class SSMUVIndexSensor(SensorEntity):
             "risk_level": None,
             "last_updated": None,
         }
-        
+
         # Define device info (same as radiation sensor for grouping)
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, entry_id)},
@@ -160,7 +160,7 @@ class SSMUVIndexSensor(SensorEntity):
         elif uv_index > 0:
             return "Low"
         return "None"
-    
+
     def _get_icon(self, uv_index):
         """Get the appropriate icon based on UV index value."""
         if uv_index >= 8:
@@ -193,38 +193,38 @@ class SSMUVIndexSensor(SensorEntity):
             # Determine if DST is in effect to set correct offset
             is_dst = time.localtime().tm_isdst > 0
             offset = "-2" if is_dst else "-1"
-            
+
             # Map location ID to API value and URL encode it
             api_location = self._map_location_id_to_api_value(self._location)
             encoded_location = quote(api_location)
             url = f"https://www.stralsakerhetsmyndigheten.se/api/uvindex/{encoded_location}?offset={offset}"
-            
+
             async with self._session.get(url) as response:
                 if response.status == 200:
                     data = await response.json()
-                    
+
                     if "response" in data and "location" in data["response"] and "date" in data["response"]["location"]:
                         location_data = data["response"]["location"]
                         today_data = location_data["date"][0]
-                        
+
                         # Get current hour UV index
                         current_hour = datetime.now().hour
                         hourly_data = today_data["hourlyUvIndex"]
                         current_uv = hourly_data[current_hour]
-                        
+
                         # Maximum UV for today
                         max_uv_today = today_data["maxUvIndex"]
                         max_uv_time = today_data["maxUvIndexTime"]
-                        
+
                         # Format time to HH:MM
                         max_time_obj = datetime.strptime(max_uv_time, "%Y-%m-%dT%H:%M:%S")
                         max_time_formatted = max_time_obj.strftime("%H:%M")
-                        
+
                         # Get tomorrow's data if available
                         max_uv_tomorrow = None
                         if len(location_data["date"]) > 1:
                             max_uv_tomorrow = location_data["date"][1]["maxUvIndex"]
-                        
+
                         # Update state and attributes
                         self._attr_native_value = current_uv
                         self._attr_extra_state_attributes["current_uv"] = current_uv
@@ -234,10 +234,10 @@ class SSMUVIndexSensor(SensorEntity):
                         self._attr_extra_state_attributes["hourly_forecast"] = hourly_data
                         self._attr_extra_state_attributes["risk_level"] = self._get_risk_level(max_uv_today)
                         self._attr_extra_state_attributes["last_updated"] = dt_util.utcnow().isoformat()
-                        
+
                         # Update icon based on current UV value
                         self._attr_icon = self._get_icon(current_uv)
-                        
+
                         self._attr_available = True
                     else:
                         _LOGGER.error("Invalid data format received from SSM UV Index API")
