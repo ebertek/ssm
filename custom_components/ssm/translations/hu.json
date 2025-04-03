@@ -8,7 +8,8 @@
         "data": {
           "name": "Név",
           "location_id": "Állomás a sugárzási adatokhoz",
-          "location": "Helység az UV-indexhez"
+          "location": "Helység az UV-indexhez",
+          "skintype": "Bőrtípus"
         }
       }
     },
@@ -28,7 +29,8 @@
         "description": "Frissítsd a sugárzás- és UV-adatok figyelésének beállításait",
         "data": {
           "location_id": "Állomás a sugárzási adatokhoz",
-          "location": "Helység az UV-indexhez"
+          "location": "Helység az UV-indexhez",
+          "skintype": "Bőrtípus"
         }
       }
     }
@@ -75,6 +77,16 @@
         "sverige-polcirkeln": "Északi sarkkör",
         "sverige-oland": "Öland",
         "sverige-ostersund": "Östersund"
+      }
+    },
+    "skin_type": {
+      "options": {
+        "1": "Type 1 (Nagyon világos, sápadt fehér)",
+        "2": "Type 2 (Világos, fehér)",
+        "3": "Type 3 (Világosbarna)",
+        "4": "Type 4 (Közepesen barna)",
+        "5": "Type 5 (Sötétbarna)",
+        "6": "Type 6 (Erősen pigmentált sötétbarna-fekete)"
       }
     }
   }

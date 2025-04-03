@@ -14,12 +14,14 @@ from homeassistant.helpers.selector import (
 )
 
 from .const import (
-    DOMAIN, 
-    CONF_LOCATION_ID, 
-    CONF_LOCATION, 
+    DOMAIN,
+    CONF_LOCATION_ID,
+    CONF_LOCATION,
+    CONF_SKIN_TYPE,
     DEFAULT_NAME,
     RADIATION_STATIONS,
-    UV_LOCATIONS
+    UV_LOCATIONS,
+    SKIN_TYPES
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -92,6 +94,12 @@ class SSMConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             for loc in UV_LOCATIONS
         ]
 
+        # Create dropdown options for skin type
+        skin_type_options = [
+            {"value": skin["id"], "label": skin["name"]}
+            for skin in SKIN_TYPES
+        ]
+
         # Provide a form for user input
         data_schema = vol.Schema(
             {
@@ -107,6 +115,13 @@ class SSMConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     SelectSelectorConfig(
                         options=uv_location_options,
                         translation_key="uv_location",
+                        mode="dropdown",
+                    )
+                ),
+                vol.Required(CONF_SKIN_TYPE): SelectSelector(
+                    SelectSelectorConfig(
+                        options=skin_type_options,
+                        translation_key="skin_type",
                         mode="dropdown",
                     )
                 ),
@@ -148,6 +163,12 @@ class SSMOptionsFlow(config_entries.OptionsFlow):
             for loc in UV_LOCATIONS
         ]
 
+        # Create dropdown options for skin type
+        skin_type_options = [
+            {"value": skin["id"], "label": skin["name"]}
+            for skin in SKIN_TYPES
+        ]
+
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema(
@@ -175,6 +196,19 @@ class SSMOptionsFlow(config_entries.OptionsFlow):
                         SelectSelectorConfig(
                             options=uv_location_options,
                             translation_key="uv_location",
+                            mode="dropdown",
+                        )
+                    ),
+                    vol.Required(
+                        CONF_SKIN_TYPE,
+                        default=self.config_entry.options.get(
+                            CONF_SKIN_TYPE,
+                            self.config_entry.data.get(CONF_SKIN_TYPE)
+                        ),
+                    ): SelectSelector(
+                        SelectSelectorConfig(
+                            options=skin_type_options,
+                            translation_key="skin_type",
                             mode="dropdown",
                         )
                     ),

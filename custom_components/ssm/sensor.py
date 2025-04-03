@@ -13,10 +13,10 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.entity import DeviceInfo
-from homeassistant.const import CONF_NAME
+from homeassistant.const import CONF_NAME, UnitOfTime
 import homeassistant.util.dt as dt_util
 
-from .const import DOMAIN, CONF_LOCATION_ID, CONF_LOCATION
+from .const import DOMAIN, CONF_LOCATION_ID, CONF_LOCATION, CONF_SKIN_TYPE
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -27,16 +27,19 @@ async def async_setup_entry(
     name = entry.data.get(CONF_NAME)
     location_id = entry.data.get(CONF_LOCATION_ID)
     location = entry.data.get(CONF_LOCATION)
+    skintype = entry.data.get(CONF_SKIN_TYPE)
 
     session = async_get_clientsession(hass)
 
+    uv_sensor = SSMUVIndexSensor(hass, session, name, location, entry.entry_id)
     sensors = [
         SSMRadiationSensor(hass, session, name, location_id, entry.entry_id),
-        SSMUVIndexSensor(hass, session, name, location, entry.entry_id),
+        uv_sensor,
     ]
-
     async_add_entities(sensors, True)
 
+    sun_time_sensor = SSMSunTimeSensor(hass, session, name, skintype, entry.entry_id, uv_sensor.entity_id)
+    async_add_entities([sun_time_sensor], True)
 
 class SSMRadiationSensor(SensorEntity):
     """Representation of a SSM Radiation Sensor."""
@@ -247,4 +250,87 @@ class SSMUVIndexSensor(SensorEntity):
                     self._attr_available = False
         except Exception as e:
             _LOGGER.error("Error updating SSM UV Index sensor: %s", e)
+            self._attr_available = False
+
+class SSMSunTimeSensor(SensorEntity):
+    """Representation of a SSM Min Soltid Sensor."""
+
+    _attr_has_entity_name = True
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_native_unit_of_measurement = "minutes"
+    _attr_icon = "mdi:weather-sunny"
+
+    def __init__(self, hass, session, name, skintype, entry_id, uv_entity_id):
+        """Initialize the sensor."""
+        self.hass = hass
+        self._session = session
+        self._attr_name = "Min soltid"
+        self._skintype = skintype
+        self._entry_id = entry_id
+        self._uv_entity_id = uv_entity_id  # Store UV entity ID
+        
+        self._attr_unique_id = f"{entry_id}_sun_time"
+        self._attr_native_value = None
+        self._attr_available = True
+        self._attr_extra_state_attributes = {
+            "shade_direct_sun": None,
+            "shade_partial": None,
+            "shade_full": None,
+            "last_updated": None,
+        }
+
+        # Define device info
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, entry_id)},
+            name=name,
+            manufacturer="Swedish Radiation Safety Authority",
+            model="Radiation and UV Monitor",
+        )
+
+    async def async_update(self):
+        """Get the latest data from the API and update the state."""
+        try:
+            # Get the latest UV index from the UV sensor
+            uv_state = self.hass.states.get(self._uv_entity_id)
+            if not uv_state or uv_state.state in (None, "unknown", "unavailable"):
+                _LOGGER.warning("UV Index sensor state is unavailable, skipping Min Soltid update")
+                self._attr_available = False
+                return
+            
+            uv_index = uv_state.state  # Get UV index value
+            _LOGGER.debug("Using UV Index: %s", uv_index)
+
+            # Prepare request payload
+            payload = {
+                "skintypeId": str(self._skintype),
+                "uvIndex": str(uv_index),
+            }
+
+            url = "https://www.stralsakerhetsmyndigheten.se/api/v1/suntime/calculatewithindex"
+
+            async with self._session.post(url, json=payload) as response:
+                if response.status == 200:
+                    data = await response.json()
+
+                    if "result" in data and "safeTimeResults" in data["result"]:
+                        results = data["result"]["safeTimeResults"]
+                        direct_sun = next((r for r in results if r["shadowDescription"] == "i direkt solljus"), None)
+                        partial_shade = next((r for r in results if r["shadowDescription"] == "i lite skugga"), None)
+                        full_shade = next((r for r in results if r["shadowDescription"] == "i mycket skugga"), None)
+
+                        # Extract values
+                        self._attr_native_value = direct_sun["safeTimeMinutes"] if direct_sun else None
+                        self._attr_extra_state_attributes["shade_direct_sun"] = direct_sun["safeTimeMinutes"] if direct_sun else None
+                        self._attr_extra_state_attributes["shade_partial"] = partial_shade["safeTimeMinutes"] if partial_shade else None
+                        self._attr_extra_state_attributes["shade_full"] = full_shade["safeTimeMinutes"] if full_shade else None
+                        self._attr_extra_state_attributes["last_updated"] = dt_util.utcnow().isoformat()
+                        self._attr_available = True
+                    else:
+                        _LOGGER.error("Invalid response from SSM Sun Time API")
+                        self._attr_available = False
+                else:
+                    _LOGGER.error("Failed to fetch sun time data: %s", response.status)
+                    self._attr_available = False
+        except Exception as e:
+            _LOGGER.error("Error updating Min Soltid sensor: %s", e)
             self._attr_available = False

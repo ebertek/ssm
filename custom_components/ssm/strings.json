@@ -8,7 +8,8 @@
         "data": {
           "name": "Name",
           "location_id": "Station for Radiation Data",
-          "location": "Location Name for UV Index"
+          "location": "Location Name for UV Index",
+          "skintype": "Skin Type"
         }
       }
     },
@@ -28,7 +29,8 @@
         "description": "Update your radiation and UV monitoring settings",
         "data": {
           "location_id": "Station for Radiation Data",
-          "location": "Location Name for UV Index"
+          "location": "Location Name for UV Index",
+          "skintype": "Skin Type"
         }
       }
     }
@@ -75,6 +77,16 @@
         "sverige-polcirkeln": "Polar Circle",
         "sverige-oland": "Öland",
         "sverige-ostersund": "Östersund"
+      }
+    },
+    "skin_type": {
+      "options": {
+        "1": "Type 1 (Very fair, burns easily)",
+        "2": "Type 2 (Fair, burns easily)",
+        "3": "Type 3 (Medium, sometimes burns)",
+        "4": "Type 4 (Olive, rarely burns)",
+        "5": "Type 5 (Brown, very rarely burns)",
+        "6": "Type 6 (Dark brown, never burns)"
       }
     }
   }

@@ -8,7 +8,8 @@
         "data": {
           "name": "Namn",
           "location_id": "Station för strålningsnivå",
-          "location": "Platsnamn för UV-index"
+          "location": "Platsnamn för UV-index",
+          "skintype": "Hudtyp"
         }
       }
     },
@@ -28,7 +29,8 @@
         "description": "Uppdatera dina inställningar för strålning och UV-övervakning",
         "data": {
           "location_id": "Station för strålningsnivå",
-          "location": "Platsnamn för UV-index"
+          "location": "Platsnamn för UV-index",
+          "skintype": "Hudtyp"
         }
       }
     }
@@ -75,6 +77,16 @@
         "sverige-polcirkeln": "Polcirkeln",
         "sverige-oland": "Öland",
         "sverige-ostersund": "Östersund"
+      }
+    },
+    "skin_type": {
+      "options": {
+        "1": "Typ 1 (Alltid röd - aldrig brun)",
+        "2": "Typ 2 (Alltid röd - ibland brun)",
+        "3": "Typ 3 (Ibland röd - alltid brun)",
+        "4": "Typ 4 (Sällan röd - alltid brun)",
+        "5": "Typ 5 (Mycket sällan röd - alltid brun)",
+        "6": "Typ 6 (Aldrig röd - alltid brun)"
       }
     }
   }

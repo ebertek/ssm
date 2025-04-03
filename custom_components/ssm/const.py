@@ -5,6 +5,7 @@ DOMAIN = "ssm"
 # Configuration constants
 CONF_LOCATION_ID = "location_id"
 CONF_LOCATION = "location"
+CONF_SKIN_TYPE = "skintype"
 DEFAULT_NAME = "SSM"
 
 # Predefined stations with their location IDs - using string keys for translation
@@ -47,4 +48,13 @@ UV_LOCATIONS = [
     {"id": "sverige-polcirkeln", "name": "Polcirkeln"},
     {"id": "sverige-oland", "name": "Öland"},
     {"id": "sverige-ostersund", "name": "Östersund"},
+]
+
+SKIN_TYPES = [
+    {"id": "1", "name": "Type 1 (Very fair, burns easily)"},
+    {"id": "2", "name": "Type 2 (Fair, burns easily)"},
+    {"id": "3", "name": "Type 3 (Medium, sometimes burns)"},
+    {"id": "4", "name": "Type 4 (Olive, rarely burns)"},
+    {"id": "5", "name": "Type 5 (Brown, very rarely burns)"},
+    {"id": "6", "name": "Type 6 (Dark brown, never burns)"},
 ]
