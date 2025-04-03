@@ -40,11 +40,11 @@ RADIATION_STATIONS = [
 ]
 
 UV_LOCATIONS = [
-    {"id": "Sverige (Gotland)", "name": "Gotland"},
-    {"id": "Sverige (Göteborg)", "name": "Göteborg"},
-    {"id": "Sverige (Malmö)", "name": "Malmö"},
-    {"id": "Sverige (Stockholm)", "name": "Stockholm"},
-    {"id": "Sverige (polcirkeln)", "name": "Polcirkeln"},
-    {"id": "Sverige (Öland)", "name": "Öland"},
-    {"id": "Sverige (Östersund)", "name": "Östersund"},
+    {"id": "sverige-gotland", "name": "Gotland"},
+    {"id": "sverige-goteborg", "name": "Göteborg"},
+    {"id": "sverige-malmo", "name": "Malmö"},
+    {"id": "sverige-stockholm", "name": "Stockholm"},
+    {"id": "sverige-polcirkeln", "name": "Polcirkeln"},
+    {"id": "sverige-oland", "name": "Öland"},
+    {"id": "sverige-ostersund", "name": "Östersund"},
 ]

@@ -65,6 +65,17 @@
         "23": "Ölands Norra Udde",
         "13": "Ölands Södra Udde"
       }
+    },
+    "uv_location": {
+      "options": {
+        "sverige-gotland": "Gotland",
+        "sverige-goteborg": "Göteborg",
+        "sverige-malmo": "Malmö",
+        "sverige-stockholm": "Stockholm",
+        "sverige-polcirkeln": "Polcirkeln",
+        "sverige-oland": "Öland",
+        "sverige-ostersund": "Östersund"
+      }
     }
   }
 }

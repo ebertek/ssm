@@ -174,6 +174,19 @@ class SSMUVIndexSensor(SensorEntity):
         else:
             return "mdi:weather-night"
 
+    def _map_location_id_to_api_value(self, location_id):
+        """Map the location ID to the API value."""
+        mapping = {
+            "sverige-gotland": "Sverige (Gotland)",
+            "sverige-goteborg": "Sverige (Göteborg)",
+            "sverige-malmo": "Sverige (Malmö)",
+            "sverige-stockholm": "Sverige (Stockholm)",
+            "sverige-polcirkeln": "Sverige (polcirkeln)",
+            "sverige-oland": "Sverige (Öland)",
+            "sverige-ostersund": "Sverige (Östersund)",
+        }
+        return mapping.get(location_id, location_id)
+
     async def async_update(self):
         """Get the latest data from the API and update the state."""
         try:
@@ -181,8 +194,9 @@ class SSMUVIndexSensor(SensorEntity):
             is_dst = time.localtime().tm_isdst > 0
             offset = "-2" if is_dst else "-1"
             
-            # URL encode the location
-            encoded_location = quote(self._location)
+            # Map location ID to API value and URL encode it
+            api_location = self._map_location_id_to_api_value(self._location)
+            encoded_location = quote(api_location)
             url = f"https://www.stralsakerhetsmyndigheten.se/api/uvindex/{encoded_location}?offset={offset}"
             
             async with self._session.get(url) as response:

@@ -65,6 +65,17 @@
         "23": "Öland északi csücske",
         "13": "Öland déli csücske"
       }
+    },
+    "uv_location": {
+      "options": {
+        "sverige-gotland": "Gotland",
+        "sverige-goteborg": "Göteborg",
+        "sverige-malmo": "Malmö",
+        "sverige-stockholm": "Stockholm",
+        "sverige-polcirkeln": "Északi sarkkör",
+        "sverige-oland": "Öland",
+        "sverige-ostersund": "Östersund"
+      }
     }
   }
 }

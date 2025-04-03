@@ -65,6 +65,17 @@
         "23": "Öland's Northern Cape",
         "13": "Öland's Southern Cape"
       }
+    },
+    "uv_location": {
+      "options": {
+        "sverige-gotland": "Gotland",
+        "sverige-goteborg": "Gothenburg",
+        "sverige-malmo": "Malmö",
+        "sverige-stockholm": "Stockholm",
+        "sverige-polcirkeln": "Polar Circle",
+        "sverige-oland": "Öland",
+        "sverige-ostersund": "Östersund"
+      }
     }
   }
 }
