@@ -28,31 +28,30 @@ _LOGGER = logging.getLogger(__name__)
 
 async def validate_input(hass: HomeAssistant, data: Dict[str, Any]) -> Dict[str, Any]:
     """Validate the user input allows us to connect."""
-    # Test radiation API endpoint
+    # Test radiation API endpoint if station is provided
     session = async_get_clientsession(hass)
 
-    # Validate the radiation endpoint
-    try:
-        url = f"https://karttjanst.ssm.se/data/getHistoryForStation?locationId={data[CONF_LOCATION_ID]}&start=0&end=1"
-        async with session.get(url) as response:
-            if response.status != 200:
-                raise Exception(f"Radiation API returned status {response.status}")
-            # Don't need to parse the JSON since we just want to verify the endpoint works
-    except Exception as e:
-        _LOGGER.error("Error validating Radiation API: %s", e)
-        raise
+    if data.get(CONF_LOCATION_ID):
+        try:
+            url = f"https://karttjanst.ssm.se/data/getHistoryForStation?locationId={data[CONF_LOCATION_ID]}&start=0&end=1"
+            async with session.get(url) as response:
+                if response.status != 200:
+                    raise Exception(f"Radiation API returned status {response.status}")
+        except Exception as e:
+            _LOGGER.error("Error validating Radiation API: %s", e)
+            raise
 
-    # Validate the UV index endpoint
-    try:
-        location = data[CONF_LOCATION].replace(" ", "%20")
-        url = f"https://www.stralsakerhetsmyndigheten.se/api/uvindex/{location}?offset=-1"
-        async with session.get(url) as response:
-            if response.status != 200:
-                raise Exception(f"UV Index API returned status {response.status}")
-            # Don't need to parse the JSON since we just want to verify the endpoint works
-    except Exception as e:
-        _LOGGER.error("Error validating UV Index API: %s", e)
-        raise
+    # Validate the UV index endpoint if location is provided
+    if data.get(CONF_LOCATION):
+        try:
+            location = data[CONF_LOCATION].replace(" ", "%20")
+            url = f"https://www.stralsakerhetsmyndigheten.se/api/uvindex/{location}?offset=-1"
+            async with session.get(url) as response:
+                if response.status != 200:
+                    raise Exception(f"UV Index API returned status {response.status}")
+        except Exception as e:
+            _LOGGER.error("Error validating UV Index API: %s", e)
+            raise
 
     # Return validated data
     return {"title": data[CONF_NAME]}
@@ -72,7 +71,7 @@ class SSMConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 info = await validate_input(self.hass, user_input)
                 
                 # Create a unique ID from location ID and location
-                await self.async_set_unique_id(f"{user_input[CONF_LOCATION_ID]}_{user_input[CONF_LOCATION]}")
+                await self.async_set_unique_id(f"{user_input.get(CONF_LOCATION_ID)}_{user_input.get(CONF_LOCATION)}")
                 self._abort_if_unique_id_configured()
                 
                 return self.async_create_entry(
@@ -104,21 +103,21 @@ class SSMConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         data_schema = vol.Schema(
             {
                 vol.Required(CONF_NAME, default=DEFAULT_NAME): str,
-                vol.Required(CONF_LOCATION_ID): SelectSelector(
+                vol.Optional(CONF_LOCATION_ID): SelectSelector(
                     SelectSelectorConfig(
                         options=station_options,
                         translation_key="station",
                         mode="dropdown",
                     )
                 ),
-                vol.Required(CONF_LOCATION): SelectSelector(
+                vol.Optional(CONF_LOCATION): SelectSelector(
                     SelectSelectorConfig(
                         options=uv_location_options,
                         translation_key="uv_location",
                         mode="dropdown",
                     )
                 ),
-                vol.Required(CONF_SKIN_TYPE): SelectSelector(
+                vol.Optional(CONF_SKIN_TYPE): SelectSelector(
                     SelectSelectorConfig(
                         options=skin_type_options,
                         translation_key="skin_type",
@@ -173,7 +172,7 @@ class SSMOptionsFlow(config_entries.OptionsFlow):
             step_id="init",
             data_schema=vol.Schema(
                 {
-                    vol.Required(
+                    vol.Optional(
                         CONF_LOCATION_ID,
                         default=self.config_entry.options.get(
                             CONF_LOCATION_ID, 
@@ -186,7 +185,7 @@ class SSMOptionsFlow(config_entries.OptionsFlow):
                             mode="dropdown",
                         )
                     ),
-                    vol.Required(
+                    vol.Optional(
                         CONF_LOCATION,
                         default=self.config_entry.options.get(
                             CONF_LOCATION,
@@ -199,7 +198,7 @@ class SSMOptionsFlow(config_entries.OptionsFlow):
                             mode="dropdown",
                         )
                     ),
-                    vol.Required(
+                    vol.Optional(
                         CONF_SKIN_TYPE,
                         default=self.config_entry.options.get(
                             CONF_SKIN_TYPE,

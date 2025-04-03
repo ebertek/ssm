@@ -24,23 +24,26 @@ async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     """Set up SSM sensors based on a config entry."""
+    # Retrieve values from the config entry
     name = entry.data.get(CONF_NAME)
     location_id = entry.data.get(CONF_LOCATION_ID)
     location = entry.data.get(CONF_LOCATION)
     skintype = entry.data.get(CONF_SKIN_TYPE)
 
+    # Create session
     session = async_get_clientsession(hass)
 
-    uv_sensor = SSMUVIndexSensor(hass, session, name, location, entry.entry_id)
-    radiation_sensor = SSMRadiationSensor(hass, session, name, location_id, entry.entry_id)
-    sensors = [
-        uv_sensor,
-        radiation_sensor,
-    ]
-    async_add_entities(sensors, True)
+    if location_id:
+        radiation_sensor = SSMRadiationSensor(hass, session, name, location_id, entry.entry_id)
+        async_add_entities([radiation_sensor], True)
 
-    sun_time_sensor = SSMSunTimeSensor(hass, session, name, skintype, uv_sensor, entry.entry_id)
-    async_add_entities([sun_time_sensor])
+    if location:
+        uv_sensor = SSMUVIndexSensor(hass, session, name, location, entry.entry_id)
+        async_add_entities([uv_sensor], True)
+
+    if skintype and location:
+        sun_time_sensor = SSMSunTimeSensor(hass, session, name, skintype, uv_sensor, entry.entry_id)
+        async_add_entities([sun_time_sensor], True)
 
 class SSMRadiationSensor(SensorEntity):
     """Representation of a SSM Radiation Sensor."""
