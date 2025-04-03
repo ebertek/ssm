@@ -1,6 +1,6 @@
 {
+  "title": "Swedish Radiation Safety Authority",
   "config": {
-    "title": "Swedish Radiation Safety Authority",
     "step": {
       "user": {
         "title": "Connect to SSM Data",

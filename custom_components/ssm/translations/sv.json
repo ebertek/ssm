@@ -1,6 +1,6 @@
 {
+  "title": "Strålsäkerhetsmyndigheten",
   "config": {
-    "title": "Strålsäkerhetsmyndigheten",
     "step": {
       "user": {
         "title": "Anslut till SSM-data",
