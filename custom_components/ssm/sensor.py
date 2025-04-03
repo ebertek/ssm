@@ -298,13 +298,15 @@ class SSMSunTimeSensor(SensorEntity):
                 return
 
             try:
-                uv_index = float(uv_state.state)  # Convert to float to ensure correct formatting
+                uv_index = int(float(uv_state.state))  # Convert to float to ensure correct formatting
             except ValueError:
                 _LOGGER.warning("UV Index sensor state is not a valid number: %s", uv_state.state)
                 self._attr_available = False
                 return
 
-            _LOGGER.debug("Using UV Index: %s", uv_index)
+            _LOGGER.debug("UV sensor entity ID: %s", self._uv_entity_id)
+            _LOGGER.debug("Retrieved UV state: %s", uv_state.state if uv_state else "None")
+            _LOGGER.debug("Converted UV index: %d", uv_index)
 
             # Prepare request payload
             payload = {
