@@ -32,14 +32,14 @@ async def async_setup_entry(
     session = async_get_clientsession(hass)
 
     uv_sensor = SSMUVIndexSensor(hass, session, name, location, entry.entry_id)
+    radiation_sensor = SSMRadiationSensor(hass, session, name, location_id, entry.entry_id)
+    sun_time_sensor = SSMSunTimeSensor(hass, session, name, skintype, entry.entry_id, uv_sensor.entity_id)
     sensors = [
-        SSMRadiationSensor(hass, session, name, location_id, entry.entry_id),
         uv_sensor,
+        radiation_sensor,
+        sun_time_sensor
     ]
     async_add_entities(sensors, True)
-
-    sun_time_sensor = SSMSunTimeSensor(hass, session, name, skintype, entry.entry_id, uv_sensor.entity_id)
-    async_add_entities([sun_time_sensor], True)
 
 class SSMRadiationSensor(SensorEntity):
     """Representation of a SSM Radiation Sensor."""
@@ -268,7 +268,7 @@ class SSMSunTimeSensor(SensorEntity):
         self._skintype = skintype
         self._entry_id = entry_id
         self._uv_entity_id = uv_entity_id  # Store UV entity ID
-        
+
         self._attr_unique_id = f"{entry_id}_sun_time"
         self._attr_native_value = None
         self._attr_available = True
@@ -296,7 +296,7 @@ class SSMSunTimeSensor(SensorEntity):
                 _LOGGER.warning("UV Index sensor state is unavailable or invalid, skipping Min Soltid update")
                 self._attr_available = False
                 return
-            
+
             try:
                 uv_index = float(uv_state.state)  # Convert to float to ensure correct formatting
             except ValueError:
