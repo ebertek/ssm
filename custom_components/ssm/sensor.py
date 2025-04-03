@@ -297,16 +297,19 @@ class SSMSunTimeSensor(SensorEntity):
                 self._attr_available = False
                 return
 
-            try:
-                uv_index = int(float(uv_state.state))  # Convert to float to ensure correct formatting
-            except ValueError:
-                _LOGGER.warning("UV Index sensor state is not a valid number: %s", uv_state.state)
+            uv_index = uv_state.attributes.get("current_uv")
+
+            if uv_index is None:
+                _LOGGER.error("UV Index sensor missing 'current_uv' attribute.")
                 self._attr_available = False
                 return
 
-            _LOGGER.debug("UV sensor entity ID: %s", self._uv_entity_id)
-            _LOGGER.debug("Retrieved UV state: %s", uv_state.state if uv_state else "None")
-            _LOGGER.debug("Converted UV index: %d", uv_index)
+            try:
+                uv_index = int(round(float(uv_index)))  # Convert to integer
+            except ValueError:
+                _LOGGER.error("Invalid UV index value: %s", uv_index)
+                self._attr_available = False
+                return
 
             # Prepare request payload
             payload = {
@@ -314,29 +317,30 @@ class SSMSunTimeSensor(SensorEntity):
                 "uvIndex": str(uv_index),
             }
 
+            _LOGGER.debug("Sending request to Sun Time API: %s", payload)
+
             url = "https://www.stralsakerhetsmyndigheten.se/api/v1/suntime/calculatewithindex"
 
             async with self._session.post(url, json=payload) as response:
                 if response.status == 200:
                     data = await response.json()
+                    _LOGGER.debug("Received Sun Time API response: %s", data)
 
                     if "result" in data and "safeTimeResults" in data["result"]:
-                        results = data["result"]["safeTimeResults"]
-                        
-                        # Check if shadowDescription is None before calling lower()
-                        direct_sun = next((r for r in results if r.get("shadowDescription") and "direkt solljus" in r["shadowDescription"].lower()), None)
-                        partial_shade = next((r for r in results if r.get("shadowDescription") and "lite skugga" in r["shadowDescription"].lower()), None)
-                        full_shade = next((r for r in results if r.get("shadowDescription") and "mycket skugga" in r["shadowDescription"].lower()), None)
+                        safe_time_results = data["result"]["safeTimeResults"]
 
-                        # Extract values using safeTime instead of safeTimeMinutes
-                        self._attr_native_value = direct_sun["safeTime"] if direct_sun else None
-                        self._attr_extra_state_attributes["shade_direct_sun"] = direct_sun["safeTime"] if direct_sun else None
-                        self._attr_extra_state_attributes["shade_partial"] = partial_shade["safeTime"] if partial_shade else None
-                        self._attr_extra_state_attributes["shade_full"] = full_shade["safeTime"] if full_shade else None
+                        direct_sun = safe_time_results[0]["safeTime"]
+                        partial_shade = safe_time_results[1]["safeTime"]
+                        full_shade = safe_time_results[2]["safeTime"]
+
+                        self._attr_native_value = direct_sun if direct_sun else None
+                        self._attr_extra_state_attributes["shade_direct_sun"] = direct_sun if direct_sun else None
+                        self._attr_extra_state_attributes["shade_partial"] = partial_shade if partial_shade else None
+                        self._attr_extra_state_attributes["shade_full"] = full_shade if full_shade else None
                         self._attr_extra_state_attributes["last_updated"] = dt_util.utcnow().isoformat()
                         self._attr_available = True
                     else:
-                        _LOGGER.error("Invalid response from SSM Sun Time API")
+                        _LOGGER.error("Unexpected API response format: %s", data)
                         self._attr_available = False
                 else:
                     _LOGGER.error("Failed to fetch sun time data: %s", response.status)
