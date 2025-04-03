@@ -292,7 +292,7 @@ class SSMSunTimeSensor(SensorEntity):
         try:
             # Get the latest UV index from the UV sensor
             uv_state = self.hass.states.get(self._uv_entity_id)
-            if not uv_state or not hasattr(uv_state, "state") or uv_state.state in (None, "unknown", "unavailable"):
+            if not uv_state or uv_state.state in (None, "unknown", "unavailable"):
                 _LOGGER.warning("UV Index sensor state is unavailable or invalid, skipping Min Soltid update")
                 self._attr_available = False
                 return
@@ -320,15 +320,17 @@ class SSMSunTimeSensor(SensorEntity):
 
                     if "result" in data and "safeTimeResults" in data["result"]:
                         results = data["result"]["safeTimeResults"]
-                        direct_sun = next((r for r in results if "direkt" in r["shadowDescription"].lower()), None)
-                        partial_shade = next((r for r in results if "lite skugga" in r["shadowDescription"].lower()), None)
-                        full_shade = next((r for r in results if "mycket skugga" in r["shadowDescription"].lower()), None)
+                        
+                        # Check if shadowDescription is None before calling lower()
+                        direct_sun = next((r for r in results if r.get("shadowDescription") and "direkt solljus" in r["shadowDescription"].lower()), None)
+                        partial_shade = next((r for r in results if r.get("shadowDescription") and "lite skugga" in r["shadowDescription"].lower()), None)
+                        full_shade = next((r for r in results if r.get("shadowDescription") and "mycket skugga" in r["shadowDescription"].lower()), None)
 
-                        # Extract values
-                        self._attr_native_value = direct_sun["safeTimeMinutes"] if direct_sun else None
-                        self._attr_extra_state_attributes["shade_direct_sun"] = direct_sun["safeTimeMinutes"] if direct_sun else None
-                        self._attr_extra_state_attributes["shade_partial"] = partial_shade["safeTimeMinutes"] if partial_shade else None
-                        self._attr_extra_state_attributes["shade_full"] = full_shade["safeTimeMinutes"] if full_shade else None
+                        # Extract values using safeTime instead of safeTimeMinutes
+                        self._attr_native_value = direct_sun["safeTime"] if direct_sun else None
+                        self._attr_extra_state_attributes["shade_direct_sun"] = direct_sun["safeTime"] if direct_sun else None
+                        self._attr_extra_state_attributes["shade_partial"] = partial_shade["safeTime"] if partial_shade else None
+                        self._attr_extra_state_attributes["shade_full"] = full_shade["safeTime"] if full_shade else None
                         self._attr_extra_state_attributes["last_updated"] = dt_util.utcnow().isoformat()
                         self._attr_available = True
                     else:
