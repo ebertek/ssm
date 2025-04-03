@@ -292,12 +292,18 @@ class SSMSunTimeSensor(SensorEntity):
         try:
             # Get the latest UV index from the UV sensor
             uv_state = self.hass.states.get(self._uv_entity_id)
-            if not uv_state or uv_state.state in (None, "unknown", "unavailable"):
-                _LOGGER.warning("UV Index sensor state is unavailable, skipping Min Soltid update")
+            if not uv_state or not hasattr(uv_state, "state") or uv_state.state in (None, "unknown", "unavailable"):
+                _LOGGER.warning("UV Index sensor state is unavailable or invalid, skipping Min Soltid update")
                 self._attr_available = False
                 return
             
-            uv_index = uv_state.state  # Get UV index value
+            try:
+                uv_index = float(uv_state.state)  # Convert to float to ensure correct formatting
+            except ValueError:
+                _LOGGER.warning("UV Index sensor state is not a valid number: %s", uv_state.state)
+                self._attr_available = False
+                return
+
             _LOGGER.debug("Using UV Index: %s", uv_index)
 
             # Prepare request payload
@@ -314,9 +320,9 @@ class SSMSunTimeSensor(SensorEntity):
 
                     if "result" in data and "safeTimeResults" in data["result"]:
                         results = data["result"]["safeTimeResults"]
-                        direct_sun = next((r for r in results if r["shadowDescription"] == "i direkt solljus"), None)
-                        partial_shade = next((r for r in results if r["shadowDescription"] == "i lite skugga"), None)
-                        full_shade = next((r for r in results if r["shadowDescription"] == "i mycket skugga"), None)
+                        direct_sun = next((r for r in results if "direkt" in r["shadowDescription"].lower()), None)
+                        partial_shade = next((r for r in results if "lite skugga" in r["shadowDescription"].lower()), None)
+                        full_shade = next((r for r in results if "mycket skugga" in r["shadowDescription"].lower()), None)
 
                         # Extract values
                         self._attr_native_value = direct_sun["safeTimeMinutes"] if direct_sun else None
