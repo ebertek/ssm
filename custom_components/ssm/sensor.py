@@ -20,29 +20,27 @@ from .const import DOMAIN, CONF_LOCATION_ID, CONF_LOCATION, CONF_SKIN_TYPE
 
 _LOGGER = logging.getLogger(__name__)
 
-async def async_setup_entry(
-    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
-) -> None:
+async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up SSM sensors based on a config entry."""
     # Retrieve values from the config entry
-    name = entry.data.get(CONF_NAME)
-    location_id = entry.data.get(CONF_LOCATION_ID)
-    location = entry.data.get(CONF_LOCATION)
-    skintype = entry.data.get(CONF_SKIN_TYPE)
+    name = config_entry.data.get(CONF_NAME)
+    location_id = config_entry.data.get(CONF_LOCATION_ID)
+    location = config_entry.data.get(CONF_LOCATION)
+    skintype = config_entry.data.get(CONF_SKIN_TYPE)
 
     # Create session
     session = async_get_clientsession(hass)
 
     if location_id:
-        radiation_sensor = SSMRadiationSensor(hass, session, name, location_id, entry.entry_id)
+        radiation_sensor = SSMRadiationSensor(hass, session, name, location_id, config_entry.entry_id)
         async_add_entities([radiation_sensor], True)
 
     if location:
-        uv_sensor = SSMUVIndexSensor(hass, session, name, location, entry.entry_id)
+        uv_sensor = SSMUVIndexSensor(hass, session, name, location, config_entry.entry_id)
         async_add_entities([uv_sensor], True)
 
     if skintype and location:
-        sun_time_sensor = SSMSunTimeSensor(hass, session, name, skintype, uv_sensor, entry.entry_id)
+        sun_time_sensor = SSMSunTimeSensor(hass, session, name, skintype, uv_sensor, config_entry.entry_id)
         async_add_entities([sun_time_sensor], True)
 
 class SSMRadiationSensor(SensorEntity):

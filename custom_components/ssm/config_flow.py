@@ -62,7 +62,7 @@ class SSMConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
     CONNECTION_CLASS = config_entries.CONN_CLASS_CLOUD_POLL
 
-    async def async_step_user(self, user_input: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    async def async_step_user(self, user_input=None):
         """Handle the initial step."""
         errors = {}
 
@@ -147,7 +147,9 @@ class SSMOptionsFlow(config_entries.OptionsFlow):
 
     async def async_step_init(self, user_input=None):
         """Manage the options."""
+        _LOGGER.debug("Options flow started")
         if user_input is not None:
+            _LOGGER.debug("User input received: %s", user_input)
             return self.async_create_entry(title="", data=user_input)
 
         # Create dropdown options for location ID

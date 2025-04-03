@@ -27,35 +27,10 @@ CONFIG_SCHEMA = vol.Schema({
     }),
 }, extra=vol.ALLOW_EXTRA)
 
-async def async_setup(hass: HomeAssistant, config: dict) -> bool:
-    """Set up the SSM component from YAML."""
-    if DOMAIN not in config:
-        return True
-
-    conf = config[DOMAIN]
-
-    # Check if a config entry with the same unique ID already exists
-    unique_id = f"{conf[CONF_LOCATION_ID]}_{conf[CONF_LOCATION]}"
-    existing_entry = await hass.config_entries.async_get_entry(unique_id)
-
-    if existing_entry:
-        _LOGGER.warning(f"Config entry with unique ID '{unique_id}' already exists.")
-        return True
-
-    # Create a config entry from the YAML configuration
-    hass.async_create_task(
-        hass.config_entries.flow.async_init(
-            DOMAIN,
-            context={"source": config_entries.SOURCE_IMPORT},
-            data=conf,
-        )
-    )
-
-    return True
-
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up SSM from a config entry."""
-    hass.data.setdefault(DOMAIN, {})
+    if hass.data.get(DOMAIN) is None:
+        hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.entry_id] = entry.data
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
@@ -68,3 +43,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass.data[DOMAIN].pop(entry.entry_id)
 
     return unload_ok
+
+async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Reload config entry."""
+    await async_unload_entry(hass, entry)
+    await async_setup_entry(hass, entry)
