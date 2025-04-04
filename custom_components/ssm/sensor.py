@@ -269,7 +269,7 @@ class SSMSunTimeSensor(SensorEntity):
     _attr_has_entity_name = True
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = "minutes"
-    _attr_icon = "mdi:weather-sunny"
+    _attr_icon = "mdi:sun-clock"
     _attr_translation_key = "min_soltid"
 
     def __init__(self, hass, session, name, skin_type, uv_sensor, entry_id):
