@@ -23,13 +23,10 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up SSM sensors based on a config entry."""
     # Get combined data from the hass.data[DOMAIN] dictionary
-    config_data = hass.data[DOMAIN][config_entry.entry_id]
-    
-    # Retrieve values from the combined config data
-    name = config_data.get(CONF_NAME)
-    station = config_data.get(CONF_STATION)
-    location = config_data.get(CONF_LOCATION)
-    skin_type = config_data.get(CONF_SKIN_TYPE)
+    name = config_entry.options.get(CONF_NAME, config_entry.data.get(CONF_NAME))
+    station = config_entry.options.get(CONF_STATION, config_entry.data.get(CONF_STATION))
+    location = config_entry.options.get(CONF_LOCATION, config_entry.data.get(CONF_LOCATION))
+    skin_type = config_entry.options.get(CONF_SKIN_TYPE, config_entry.data.get(CONF_SKIN_TYPE))
 
     # Create session
     session = async_get_clientsession(hass)
