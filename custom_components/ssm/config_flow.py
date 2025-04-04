@@ -70,8 +70,8 @@ class SSMConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             try:
                 info = await validate_input(self.hass, user_input)
                 
-                # Create a unique ID from location ID and location
-                await self.async_set_unique_id(f"{user_input.get(CONF_STATION)}_{user_input.get(CONF_LOCATION)}")
+                # Create a unique ID from name + location ID and location
+                await self.async_set_unique_id(f"{user_input[CONF_NAME]}_{user_input.get(CONF_STATION)}_{user_input.get(CONF_LOCATION)}")
                 self._abort_if_unique_id_configured()
                 
                 return self.async_create_entry(
@@ -148,9 +148,12 @@ class SSMOptionsFlow(config_entries.OptionsFlow):
     async def async_step_init(self, user_input=None):
         """Manage the options."""
         _LOGGER.debug("Options flow started")
+        
         if user_input is not None:
             _LOGGER.debug("User input received: %s", user_input)
-            return self.async_create_entry(title="", data=user_input)
+            # Remove empty fields to make them truly optional
+            cleaned_input = {k: v for k, v in user_input.items() if v not in (None, "")}
+            return self.async_create_entry(title="", data=cleaned_input)
 
         # Create dropdown options for location ID
         station_options = [
@@ -170,43 +173,30 @@ class SSMOptionsFlow(config_entries.OptionsFlow):
             for skin_type in SKIN_TYPES
         ]
 
+        # Get current values from config or options
+        station = self.config_entry.options.get(CONF_STATION, self.config_entry.data.get(CONF_STATION, ""))
+        location = self.config_entry.options.get(CONF_LOCATION, self.config_entry.data.get(CONF_LOCATION, ""))
+        skin_type = self.config_entry.options.get(CONF_SKIN_TYPE, self.config_entry.data.get(CONF_SKIN_TYPE, ""))
+
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema(
                 {
-                    vol.Optional(
-                        CONF_STATION,
-                        default=self.config_entry.options.get(
-                            CONF_STATION, 
-                            self.config_entry.data.get(CONF_STATION)
-                        ),
-                    ): SelectSelector(
+                    vol.Optional(CONF_STATION, default=station): SelectSelector(
                         SelectSelectorConfig(
                             options=station_options,
                             translation_key="station",
                             mode="dropdown",
                         )
                     ),
-                    vol.Optional(
-                        CONF_LOCATION,
-                        default=self.config_entry.options.get(
-                            CONF_LOCATION,
-                            self.config_entry.data.get(CONF_LOCATION)
-                        ),
-                    ): SelectSelector(
+                    vol.Optional(CONF_LOCATION, default=location): SelectSelector(
                         SelectSelectorConfig(
                             options=location_options,
                             translation_key="location",
                             mode="dropdown",
                         )
                     ),
-                    vol.Optional(
-                        CONF_SKIN_TYPE,
-                        default=self.config_entry.options.get(
-                            CONF_SKIN_TYPE,
-                            self.config_entry.data.get(CONF_SKIN_TYPE)
-                        ),
-                    ): SelectSelector(
+                    vol.Optional(CONF_SKIN_TYPE, default=skin_type): SelectSelector(
                         SelectSelectorConfig(
                             options=skin_type_options,
                             translation_key="skin_type",

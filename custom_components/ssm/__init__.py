@@ -31,7 +31,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up SSM from a config entry."""
     if hass.data.get(DOMAIN) is None:
         hass.data.setdefault(DOMAIN, {})
-    hass.data[DOMAIN][entry.entry_id] = entry.data
+    
+    # Combine data from entry.data and entry.options
+    combined_data = dict(entry.data)
+    # Update with options, options take precedence over data
+    if entry.options:
+        combined_data.update(entry.options)
+    
+    # Store the combined data
+    hass.data[DOMAIN][entry.entry_id] = combined_data
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True

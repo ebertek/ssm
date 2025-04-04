@@ -22,26 +22,36 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up SSM sensors based on a config entry."""
-    # Retrieve values from the config entry
-    name = config_entry.data.get(CONF_NAME)
-    station = config_entry.data.get(CONF_STATION)
-    location = config_entry.data.get(CONF_LOCATION)
-    skintype = config_entry.data.get(CONF_SKIN_TYPE)
+    # Get combined data from the hass.data[DOMAIN] dictionary
+    config_data = hass.data[DOMAIN][config_entry.entry_id]
+    
+    # Retrieve values from the combined config data
+    name = config_data.get(CONF_NAME)
+    station = config_data.get(CONF_STATION)
+    location = config_data.get(CONF_LOCATION)
+    skin_type = config_data.get(CONF_SKIN_TYPE)
 
     # Create session
     session = async_get_clientsession(hass)
+    
+    # List to track added entities
+    entities = []
 
     if station:
         radiation_sensor = SSMRadiationSensor(hass, session, name, station, config_entry.entry_id)
-        async_add_entities([radiation_sensor], True)
+        entities.append(radiation_sensor)
 
     if location:
         uv_sensor = SSMUVIndexSensor(hass, session, name, location, config_entry.entry_id)
-        async_add_entities([uv_sensor], True)
+        entities.append(uv_sensor)
 
-    if skintype and location:
-        sun_time_sensor = SSMSunTimeSensor(hass, session, name, skintype, uv_sensor, config_entry.entry_id)
-        async_add_entities([sun_time_sensor], True)
+        # Only add sun time sensor if both location and skin_type are available
+        if skin_type:
+            sun_time_sensor = SSMSunTimeSensor(hass, session, name, skin_type, uv_sensor, config_entry.entry_id)
+            entities.append(sun_time_sensor)
+
+    if entities:
+        async_add_entities(entities, True)
 
 class SSMRadiationSensor(SensorEntity):
     """Representation of a SSM Radiation Sensor."""
@@ -115,7 +125,6 @@ class SSMRadiationSensor(SensorEntity):
         except Exception as e:
             _LOGGER.error("Error updating SSM Radiation sensor: %s", e)
             self._attr_available = False
-
 
 class SSMUVIndexSensor(SensorEntity):
     """Representation of a SSM UV Index Sensor."""
@@ -265,12 +274,12 @@ class SSMSunTimeSensor(SensorEntity):
     _attr_native_unit_of_measurement = "minutes"
     _attr_icon = "mdi:weather-sunny"
 
-    def __init__(self, hass, session, name, skintype, uv_sensor, entry_id):
+    def __init__(self, hass, session, name, skin_type, uv_sensor, entry_id):
         """Initialize the sensor."""
         self.hass = hass
         self._session = session
         self._attr_name = "Min soltid"
-        self._skintype = skintype
+        self._skin_type = skin_type
         self._uv_sensor = uv_sensor
         self._entry_id = entry_id
 
@@ -320,7 +329,7 @@ class SSMSunTimeSensor(SensorEntity):
 
             # Prepare request payload
             payload = {
-                "skintypeId": str(self._skintype),
+                "skintypeId": str(self._skin_type),
                 "uvIndex": str(uv_index),
             }
 
