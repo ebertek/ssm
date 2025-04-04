@@ -56,6 +56,7 @@ class SSMRadiationSensor(SensorEntity):
     _attr_has_entity_name = True
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = "nSv/h"
+    _attr_icon = "mdi:radioactive"
     _attr_translation_key = "radiation_level"
 
     def __init__(self, hass, session, name, station, entry_id):
@@ -68,7 +69,6 @@ class SSMRadiationSensor(SensorEntity):
 
         self._attr_unique_id = f"{entry_id}_radiation"
         self._attr_native_value = None
-        self._attr_icon = "mdi:radioactive"
         self._attr_available = True
 
         self._attr_extra_state_attributes = {
@@ -128,6 +128,7 @@ class SSMUVIndexSensor(SensorEntity):
     _attr_has_entity_name = True
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = "UV"
+    _attr_icon = "mdi:sun-wireless"
     _attr_translation_key = "uv_index"
 
     def __init__(self, hass, session, name, location, entry_id):
