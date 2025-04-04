@@ -128,19 +128,19 @@
             "name": "Előjelzés"
           },
           "risk_level": {
-            "name": "Veszélyességi szint"
+            "name": "Veszélyességi szint",
+            "state": {
+              "extreme": "Extrém",
+              "very_high": "Nagyon erős",
+              "high": "Erős",
+              "moderate": "Mérsékelt",
+              "low": "Gyenge",
+              "none": "Nincs"
+            }
           },
           "last_updated": {
             "name": "Utoljára frissítve"
           }
-        },
-        "state": {
-          "extreme": "Extrém",
-          "very_high": "Nagyon erős",
-          "high": "Erős",
-          "moderate": "Mérsékelt",
-          "low": "Gyenge",
-          "none": "Nincs"
         }
       },
       "radiation_level": {

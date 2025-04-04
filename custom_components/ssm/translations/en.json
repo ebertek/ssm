@@ -128,19 +128,19 @@
             "name": "Hourly forecast"
           },
           "risk_level": {
-            "name": "Risk level"
+            "name": "Risk level",
+            "state": {
+              "extreme": "Extreme",
+              "very_high": "Very High",
+              "high": "High",
+              "moderate": "Moderate",
+              "low": "Low",
+              "none": "None"
+            }
           },
           "last_updated": {
             "name": "Last updated"
           }
-        },
-        "state": {
-          "extreme": "Extreme",
-          "very_high": "Very High",
-          "high": "High",
-          "moderate": "Moderate",
-          "low": "Low",
-          "none": "None"
         }
       },
       "radiation_level": {

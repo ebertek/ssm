@@ -128,19 +128,19 @@
             "name": "Prognos"
           },
           "risk_level": {
-            "name": "Risknivå"
+            "name": "Risknivå",
+            "state": {
+              "extreme": "Extremt",
+              "very_high": "Mycket högt",
+              "high": "Högt",
+              "moderate": "Medelhögt",
+              "low": "Lågt",
+              "none": "Inget"
+            }
           },
           "last_updated": {
             "name": "Senast uppdaterad"
           }
-        },
-        "state": {
-          "extreme": "Extremt",
-          "very_high": "Mycket högt",
-          "high": "Högt",
-          "moderate": "Medelhögt",
-          "low": "Lågt",
-          "none": "Inget"
         }
       },
       "radiation_level": {
