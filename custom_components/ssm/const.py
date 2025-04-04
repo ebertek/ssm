@@ -3,13 +3,13 @@
 DOMAIN = "ssm"
 
 # Configuration constants
-CONF_LOCATION_ID = "location_id"
+CONF_STATION = "station"
 CONF_LOCATION = "location"
-CONF_SKIN_TYPE = "skintype"
+CONF_SKIN_TYPE = "skin_type"
 DEFAULT_NAME = "SSM"
 
-# Predefined stations with their location IDs - using string keys for translation
-RADIATION_STATIONS = [
+# Predefined stations with their location IDs
+STATIONS = [
     {"id": "20", "name": "Bjuruklubb (Skellefteå)"},
     {"id": "5", "name": "Brämön"},
     {"id": "7", "name": "Fårösund"},
@@ -40,7 +40,7 @@ RADIATION_STATIONS = [
     {"id": "13", "name": "Ölands Södra Udde"},
 ]
 
-UV_LOCATIONS = [
+LOCATIONS = [
     {"id": "sverige-gotland", "name": "Gotland"},
     {"id": "sverige-goteborg", "name": "Göteborg"},
     {"id": "sverige-malmo", "name": "Malmö"},

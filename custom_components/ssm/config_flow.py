@@ -15,12 +15,12 @@ from homeassistant.helpers.selector import (
 
 from .const import (
     DOMAIN,
-    CONF_LOCATION_ID,
+    CONF_STATION,
     CONF_LOCATION,
     CONF_SKIN_TYPE,
     DEFAULT_NAME,
-    RADIATION_STATIONS,
-    UV_LOCATIONS,
+    STATIONS,
+    LOCATIONS,
     SKIN_TYPES
 )
 
@@ -31,9 +31,9 @@ async def validate_input(hass: HomeAssistant, data: Dict[str, Any]) -> Dict[str,
     # Test radiation API endpoint if station is provided
     session = async_get_clientsession(hass)
 
-    if data.get(CONF_LOCATION_ID):
+    if data.get(CONF_STATION):
         try:
-            url = f"https://karttjanst.ssm.se/data/getHistoryForStation?locationId={data[CONF_LOCATION_ID]}&start=0&end=1"
+            url = f"https://karttjanst.ssm.se/data/getHistoryForStation?locationId={data[CONF_STATION]}&start=0&end=1"
             async with session.get(url) as response:
                 if response.status != 200:
                     raise Exception(f"Radiation API returned status {response.status}")
@@ -71,7 +71,7 @@ class SSMConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 info = await validate_input(self.hass, user_input)
                 
                 # Create a unique ID from location ID and location
-                await self.async_set_unique_id(f"{user_input.get(CONF_LOCATION_ID)}_{user_input.get(CONF_LOCATION)}")
+                await self.async_set_unique_id(f"{user_input.get(CONF_STATION)}_{user_input.get(CONF_LOCATION)}")
                 self._abort_if_unique_id_configured()
                 
                 return self.async_create_entry(
@@ -84,26 +84,26 @@ class SSMConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         # Create dropdown options for location ID
         station_options = [
             {"value": station["id"], "label": station["name"]}
-            for station in RADIATION_STATIONS
+            for station in STATIONS
         ]
 
         # Create dropdown options for UV locations
-        uv_location_options = [
-            {"value": loc["id"], "label": loc["name"]}
-            for loc in UV_LOCATIONS
+        location_options = [
+            {"value": location["id"], "label": location["name"]}
+            for location in LOCATIONS
         ]
 
         # Create dropdown options for skin type
         skin_type_options = [
-            {"value": skin["id"], "label": skin["name"]}
-            for skin in SKIN_TYPES
+            {"value": skin_type["id"], "label": skin_type["name"]}
+            for skin_type in SKIN_TYPES
         ]
 
         # Provide a form for user input
         data_schema = vol.Schema(
             {
                 vol.Required(CONF_NAME, default=DEFAULT_NAME): str,
-                vol.Optional(CONF_LOCATION_ID): SelectSelector(
+                vol.Optional(CONF_STATION): SelectSelector(
                     SelectSelectorConfig(
                         options=station_options,
                         translation_key="station",
@@ -112,8 +112,8 @@ class SSMConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 ),
                 vol.Optional(CONF_LOCATION): SelectSelector(
                     SelectSelectorConfig(
-                        options=uv_location_options,
-                        translation_key="uv_location",
+                        options=location_options,
+                        translation_key="location",
                         mode="dropdown",
                     )
                 ),
@@ -155,19 +155,19 @@ class SSMOptionsFlow(config_entries.OptionsFlow):
         # Create dropdown options for location ID
         station_options = [
             {"value": station["id"], "label": station["name"]}
-            for station in RADIATION_STATIONS
+            for station in STATIONS
         ]
 
         # Create dropdown options for UV locations
-        uv_location_options = [
-            {"value": loc["id"], "label": loc["name"]}
-            for loc in UV_LOCATIONS
+        location_options = [
+            {"value": location["id"], "label": location["name"]}
+            for location in LOCATIONS
         ]
 
         # Create dropdown options for skin type
         skin_type_options = [
-            {"value": skin["id"], "label": skin["name"]}
-            for skin in SKIN_TYPES
+            {"value": skin_type["id"], "label": skin_type["name"]}
+            for skin_type in SKIN_TYPES
         ]
 
         return self.async_show_form(
@@ -175,10 +175,10 @@ class SSMOptionsFlow(config_entries.OptionsFlow):
             data_schema=vol.Schema(
                 {
                     vol.Optional(
-                        CONF_LOCATION_ID,
+                        CONF_STATION,
                         default=self.config_entry.options.get(
-                            CONF_LOCATION_ID, 
-                            self.config_entry.data.get(CONF_LOCATION_ID)
+                            CONF_STATION, 
+                            self.config_entry.data.get(CONF_STATION)
                         ),
                     ): SelectSelector(
                         SelectSelectorConfig(
@@ -195,8 +195,8 @@ class SSMOptionsFlow(config_entries.OptionsFlow):
                         ),
                     ): SelectSelector(
                         SelectSelectorConfig(
-                            options=uv_location_options,
-                            translation_key="uv_location",
+                            options=location_options,
+                            translation_key="location",
                             mode="dropdown",
                         )
                     ),

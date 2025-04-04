@@ -16,7 +16,7 @@ from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.const import CONF_NAME, UnitOfTime
 import homeassistant.util.dt as dt_util
 
-from .const import DOMAIN, CONF_LOCATION_ID, CONF_LOCATION, CONF_SKIN_TYPE
+from .const import DOMAIN, CONF_STATION, CONF_LOCATION, CONF_SKIN_TYPE
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -24,15 +24,15 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up SSM sensors based on a config entry."""
     # Retrieve values from the config entry
     name = config_entry.data.get(CONF_NAME)
-    location_id = config_entry.data.get(CONF_LOCATION_ID)
+    station = config_entry.data.get(CONF_STATION)
     location = config_entry.data.get(CONF_LOCATION)
     skintype = config_entry.data.get(CONF_SKIN_TYPE)
 
     # Create session
     session = async_get_clientsession(hass)
 
-    if location_id:
-        radiation_sensor = SSMRadiationSensor(hass, session, name, location_id, config_entry.entry_id)
+    if station:
+        radiation_sensor = SSMRadiationSensor(hass, session, name, station, config_entry.entry_id)
         async_add_entities([radiation_sensor], True)
 
     if location:
@@ -50,12 +50,12 @@ class SSMRadiationSensor(SensorEntity):
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = "nSv/h"
 
-    def __init__(self, hass, session, name, location_id, entry_id):
+    def __init__(self, hass, session, name, station, entry_id):
         """Initialize the sensor."""
         self.hass = hass
         self._session = session
         self._attr_name = "Radiation Level"
-        self._location_id = location_id
+        self._station = station
         self._entry_id = entry_id
 
         self._attr_unique_id = f"{entry_id}_radiation"
@@ -88,7 +88,7 @@ class SSMRadiationSensor(SensorEntity):
             start_timestamp = int(start_of_day.timestamp() * 1000)
             end_timestamp = int(now.timestamp() * 1000)
 
-            url = f"https://karttjanst.ssm.se/data/getHistoryForStation?locationId={self._location_id}&start={start_timestamp}&end={end_timestamp}"
+            url = f"https://karttjanst.ssm.se/data/getHistoryForStation?locationId={self._station}&start={start_timestamp}&end={end_timestamp}"
 
             async with self._session.get(url) as response:
                 if response.status == 200:
@@ -181,8 +181,8 @@ class SSMUVIndexSensor(SensorEntity):
         else:
             return "mdi:weather-night"
 
-    def _map_location_id_to_api_value(self, location_id):
-        """Map the location ID to the API value."""
+    def _map_location_to_api_value(self, location):
+        """Map the location to the API value."""
         mapping = {
             "sverige-gotland": "Sverige (Gotland)",
             "sverige-goteborg": "Sverige (Göteborg)",
@@ -192,7 +192,7 @@ class SSMUVIndexSensor(SensorEntity):
             "sverige-oland": "Sverige (Öland)",
             "sverige-ostersund": "Sverige (Östersund)",
         }
-        return mapping.get(location_id, location_id)
+        return mapping.get(location, location)
 
     async def async_update(self):
         """Get the latest data from the API and update the state."""
@@ -201,8 +201,8 @@ class SSMUVIndexSensor(SensorEntity):
             is_dst = time.localtime().tm_isdst > 0
             offset = "-2" if is_dst else "-1"
 
-            # Map location ID to API value and URL encode it
-            api_location = self._map_location_id_to_api_value(self._location)
+            # Map location to API value and URL encode it
+            api_location = self._map_location_to_api_value(self._location)
             encoded_location = quote(api_location)
             url = f"https://www.stralsakerhetsmyndigheten.se/api/uvindex/{encoded_location}?offset={offset}"
 

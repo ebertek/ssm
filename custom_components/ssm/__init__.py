@@ -8,7 +8,7 @@ import homeassistant.helpers.config_validation as cv
 
 from .const import (
     DOMAIN,
-    CONF_LOCATION_ID,
+    CONF_STATION,
     CONF_LOCATION,
     CONF_SKIN_TYPE,
     DEFAULT_NAME,
@@ -21,7 +21,7 @@ PLATFORMS = [Platform.SENSOR]
 CONFIG_SCHEMA = vol.Schema({
     DOMAIN: vol.Schema({
         vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
-        vol.Optional(CONF_LOCATION_ID): cv.string,
+        vol.Optional(CONF_STATION): cv.string,
         vol.Optional(CONF_LOCATION): cv.string,
         vol.Optional(CONF_SKIN_TYPE): cv.string,
     }),

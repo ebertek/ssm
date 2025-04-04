@@ -7,9 +7,9 @@
         "description": "Set up the Swedish Radiation Safety Authority integration to monitor radiation and UV data.",
         "data": {
           "name": "Name",
-          "location_id": "Station for Radiation Data",
+          "station": "Station for Radiation Data",
           "location": "Location Name for UV Index",
-          "skintype": "Skin Type"
+          "skin_type": "Skin Type"
         }
       }
     },
@@ -28,9 +28,9 @@
         "title": "SSM Integration Options",
         "description": "Update your radiation and UV monitoring settings",
         "data": {
-          "location_id": "Station for Radiation Data",
+          "station": "Station for Radiation Data",
           "location": "Location Name for UV Index",
-          "skintype": "Skin Type"
+          "skin_type": "Skin Type"
         }
       }
     }
@@ -68,7 +68,7 @@
         "13": "Öland's Southern Cape"
       }
     },
-    "uv_location": {
+    "location": {
       "options": {
         "sverige-gotland": "Gotland",
         "sverige-goteborg": "Gothenburg",

@@ -7,9 +7,9 @@
         "description": "Ställ in Strålsäkerhetsmyndighetens integration för att övervaka gammastrålningsnivåer och UV-index.",
         "data": {
           "name": "Namn",
-          "location_id": "Station för strålningsnivå",
+          "station": "Station för strålningsnivå",
           "location": "Platsnamn för UV-index",
-          "skintype": "Hudtyp"
+          "skin_type": "Hudtyp"
         }
       }
     },
@@ -28,9 +28,9 @@
         "title": "SSM-integrationsalternativ",
         "description": "Uppdatera dina inställningar för strålning och UV-övervakning",
         "data": {
-          "location_id": "Station för strålningsnivå",
+          "station": "Station för strålningsnivå",
           "location": "Platsnamn för UV-index",
-          "skintype": "Hudtyp"
+          "skin_type": "Hudtyp"
         }
       }
     }
@@ -68,7 +68,7 @@
         "13": "Ölands Södra Udde"
       }
     },
-    "uv_location": {
+    "location": {
       "options": {
         "sverige-gotland": "Gotland",
         "sverige-goteborg": "Göteborg",

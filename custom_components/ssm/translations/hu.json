@@ -7,9 +7,9 @@
         "description": "Állítsd be a Svéd Sugárbiztonsági Hatóság integrációját a sugárzás- és UV-adatok figyeléséhez.",
         "data": {
           "name": "Név",
-          "location_id": "Állomás a sugárzási adatokhoz",
+          "station": "Állomás a sugárzási adatokhoz",
           "location": "Helység az UV-indexhez",
-          "skintype": "Bőrtípus"
+          "skin_type": "Bőrtípus"
         }
       }
     },
@@ -28,9 +28,9 @@
         "title": "SSM integrációs beállítások",
         "description": "Frissítsd a sugárzás- és UV-adatok figyelésének beállításait",
         "data": {
-          "location_id": "Állomás a sugárzási adatokhoz",
+          "station": "Állomás a sugárzási adatokhoz",
           "location": "Helység az UV-indexhez",
-          "skintype": "Bőrtípus"
+          "skin_type": "Bőrtípus"
         }
       }
     }
@@ -68,7 +68,7 @@
         "13": "Öland déli csücske"
       }
     },
-    "uv_location": {
+    "location": {
       "options": {
         "sverige-gotland": "Gotland",
         "sverige-goteborg": "Göteborg",
