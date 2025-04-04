@@ -157,9 +157,6 @@
           },
           "last_updated": {
             "name": "Last updated"
-          },
-          "raw_data": {
-            "name": "Raw data"
           }
         }
       }
