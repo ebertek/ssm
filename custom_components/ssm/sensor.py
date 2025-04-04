@@ -56,6 +56,7 @@ class SSMRadiationSensor(SensorEntity):
     _attr_has_entity_name = True
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = "nSv/h"
+    _attr_translation_key = "radiation_level"
 
     def __init__(self, hass, session, name, station, entry_id):
         """Initialize the sensor."""
@@ -127,6 +128,7 @@ class SSMUVIndexSensor(SensorEntity):
     _attr_has_entity_name = True
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = "UV"
+    _attr_translation_key = "uv_index"
 
     def __init__(self, hass, session, name, location, entry_id):
         """Initialize the sensor."""
@@ -268,6 +270,7 @@ class SSMSunTimeSensor(SensorEntity):
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = "minutes"
     _attr_icon = "mdi:weather-sunny"
+    _attr_translation_key = "min_soltid"
 
     def __init__(self, hass, session, name, skin_type, uv_sensor, entry_id):
         """Initialize the sensor."""
