@@ -1,4 +1,5 @@
 """Sensor platform for Swedish Radiation Safety Authority integration."""
+import asyncio
 import logging
 from datetime import timedelta, datetime
 import time
@@ -307,14 +308,41 @@ class SSMSunTimeSensor(SensorEntity):
             model="Radiation and UV Monitor",
         )
 
+    async def _get_uv_state(self):
+        """Helper method to fetch the UV entity state asynchronously."""
+        # Wait until the UV sensor and its entity_id become available
+        while (not hasattr(self, '_uv_sensor') or self._uv_sensor is None or not hasattr(self._uv_sensor, 'entity_id') or self._uv_sensor.entity_id is None):
+            _LOGGER.debug("Waiting for UV sensor reference to become available...")
+            await asyncio.sleep(2)  # Wait 2 seconds before checking again
+
+        uv_entity_id = self._uv_sensor.entity_id
+        uv_state = self.hass.states.get(uv_entity_id)
+
+        while uv_state is None:
+            _LOGGER.debug("Waiting for state of %s to be available...", uv_entity_id)
+            await asyncio.sleep(2)
+            uv_state = self.hass.states.get(uv_entity_id)
+
+        return uv_state
+
     async def async_update(self):
         """Get the latest data from the API and update the state."""
         try:
             # Get the latest UV index from the UV sensor
-            uv_entity_id = self._uv_sensor.entity_id
-            uv_state = self.hass.states.get(uv_entity_id)
-            if not uv_state or uv_state.state in (None, "unknown", "unavailable"):
-                _LOGGER.warning("UV Index sensor state is unavailable or invalid, skipping Min Soltid update")
+            try:
+                uv_state = await asyncio.wait_for(self._get_uv_state(), timeout=30)
+            except asyncio.TimeoutError:
+                _LOGGER.error("Timeout waiting for UV sensor state")
+                self._attr_available = False
+                return
+
+            if not uv_state:
+                _LOGGER.warning("UV Index sensor state could not be retrieved, skipping Min Soltid update")
+                self._attr_available = False
+                return
+
+            if uv_state.state in (None, "unknown", "unavailable"):
+                _LOGGER.warning("UV Index sensor state is %s, skipping Min Soltid update", uv_state.state)
                 self._attr_available = False
                 return
 
