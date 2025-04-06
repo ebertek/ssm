@@ -97,9 +97,12 @@ class SSMRadiationSensor(SensorEntity):
 
             url = f"https://karttjanst.ssm.se/data/getHistoryForStation?locationId={self._station}&start={start_timestamp}&end={end_timestamp}"
 
+            _LOGGER.debug("Sending request to Radiation API: %s", url)
+
             async with self._session.get(url) as response:
                 if response.status == 200:
                     data = await response.json()
+                    _LOGGER.debug("Received Radiation API response: %s", data)
 
                     if "values" in data and data["values"]:
                         values = data["values"]
@@ -213,9 +216,12 @@ class SSMUVIndexSensor(SensorEntity):
             encoded_location = quote(api_location)
             url = f"https://www.stralsakerhetsmyndigheten.se/api/uvindex/{encoded_location}?offset={offset}"
 
+            _LOGGER.debug("Sending request to UV Index API: %s", url)
+
             async with self._session.get(url) as response:
                 if response.status == 200:
                     data = await response.json()
+                    _LOGGER.debug("Received UV Index API response: %s", data)
 
                     if "response" in data and "location" in data["response"] and "date" in data["response"]["location"]:
                         location_data = data["response"]["location"]
