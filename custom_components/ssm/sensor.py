@@ -9,11 +9,9 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.entity import DeviceInfo
-from homeassistant.const import CONF_NAME, UnitOfTime
+from homeassistant.const import CONF_NAME
 import homeassistant.util.dt as dt_util
 
 from .const import DOMAIN, CONF_STATION, CONF_LOCATION, CONF_SKIN_TYPE
