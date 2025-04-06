@@ -1,6 +1,6 @@
 """Sensor platform for Swedish Radiation Safety Authority integration."""
 import logging
-from datetime import datetime
+from datetime import timedelta, datetime
 import time
 from urllib.parse import quote
 
@@ -19,6 +19,8 @@ import homeassistant.util.dt as dt_util
 from .const import DOMAIN, CONF_STATION, CONF_LOCATION, CONF_SKIN_TYPE
 
 _LOGGER = logging.getLogger(__name__)
+
+SCAN_INTERVAL = timedelta(minutes=30)
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up SSM sensors based on a config entry."""
