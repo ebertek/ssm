@@ -87,9 +87,12 @@ class SSMRadiationSensor(SensorEntity):
     async def async_update(self):
         """Get the latest data from the API and update the state."""
         try:
-            # Calculate midnight timestamp in UTC (milliseconds)
-            now = dt_util.utcnow()
+            # Get timezone-aware local time; SSM API returns UTC in response, but expects local time in request
+            # TODO: Confirm if API actually expects local time or Sweden time (CET in winter, CEST in summer)
+            now = dt_util.now()
+            # Get local midnight (00:00 today)
             start_of_day = now.replace(hour=0, minute=0, second=0, microsecond=0)
+            # Convert to Unix timestamps in milliseconds
             start_timestamp = int(start_of_day.timestamp() * 1000)
             end_timestamp = int(now.timestamp() * 1000)
 
