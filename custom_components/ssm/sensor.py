@@ -1,19 +1,16 @@
 """Sensor platform for Swedish Radiation Safety Authority integration."""
 import asyncio
-import logging
 from datetime import timedelta, datetime
+import logging
 import time
 from urllib.parse import quote
 
-from homeassistant.components.sensor import (
-    SensorEntity,
-    SensorStateClass,
-)
+from homeassistant.components.sensor import SensorEntity, SensorStateClass
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import CONF_NAME
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.entity import DeviceInfo
-from homeassistant.const import CONF_NAME
-import homeassistant.util.dt as dt_util
+from homeassistant.util import dt as dt_util
 
 from .const import DOMAIN, CONF_STATION, CONF_LOCATION, CONF_SKIN_TYPE
 
@@ -31,7 +28,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
     # Create session
     session = async_get_clientsession(hass)
-    
+
     # List to track added entities
     entities = []
 
