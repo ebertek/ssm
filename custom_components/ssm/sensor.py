@@ -311,24 +311,26 @@ class SSMSunTimeSensor(SensorEntity):
         location = next((loc for loc in LOCATIONS if loc["id"] == location_id), None)
         return location.get("latitude") if location else None
 
-    async def _get_uv_index(self):
+    async def _get_uv_index(self, retries=5, delay=2):
         """Fetch the current UV index from the UV sensor if available."""
-        try:
-            if not hasattr(self._uv_sensor, 'entity_id') or not self._uv_sensor.entity_id:
-                return None
+        for attempt in range(retries):
+            try:
+                if not hasattr(self._uv_sensor, 'entity_id') or not self._uv_sensor.entity_id:
+                    return None
 
-            uv_state = self.hass.states.get(self._uv_sensor.entity_id)
-            if not uv_state or uv_state.state in (None, "unknown", "unavailable"):
-                return None
+                uv_state = self.hass.states.get(self._uv_sensor.entity_id)
+                if uv_state and uv_state.state not in (None, "unknown", "unavailable"):
+                    uv_index = uv_state.attributes.get("current_uv")
+                    if uv_index is not None:
+                        return int(round(float(uv_index)))
+            except Exception as e:
+                _LOGGER.warning("Error retrieving UV index on attempt %d: %s", attempt + 1, e)
 
-            uv_index = uv_state.attributes.get("current_uv")
-            if uv_index is None:
-                return None
+            _LOGGER.debug("UV index not ready (attempt %d), retrying in %ds...", attempt + 1, delay)
+            await asyncio.sleep(delay)
 
-            return int(round(float(uv_index)))
-        except Exception as e:
-            _LOGGER.warning("Error getting UV index from sensor: %s", e)
-            return None
+        _LOGGER.debug("UV index unavailable after %d attempts", retries)
+        return None
 
     async def async_update(self):
         """Get the latest data from the API and update the state."""
