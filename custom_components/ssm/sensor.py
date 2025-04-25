@@ -243,13 +243,19 @@ class SSMUVIndexSensor(SensorEntity):
                         if len(location_data["date"]) > 1:
                             max_uv_tomorrow = location_data["date"][1]["maxUvIndex"]
 
+                        # Format hourly forecast
+                        hourly_forecast = ", ".join(
+                            f"{hour:02d}:00 — {uv:.2f}"
+                            for hour, uv in enumerate(hourly_data)
+                        )
+
                         # Update state and attributes
                         self._attr_native_value = current_uv
                         self._attr_extra_state_attributes["current_uv"] = current_uv
                         self._attr_extra_state_attributes["max_uv_today"] = max_uv_today
                         self._attr_extra_state_attributes["max_uv_time"] = max_time_formatted
                         self._attr_extra_state_attributes["max_uv_tomorrow"] = max_uv_tomorrow
-                        self._attr_extra_state_attributes["hourly_forecast"] = hourly_data
+                        self._attr_extra_state_attributes["hourly_forecast"] = hourly_forecast
                         risk_level_key = self._get_risk_level(max_uv_today)
                         self._attr_extra_state_attributes["risk_level"] = risk_level_key
                         self._attr_extra_state_attributes["last_updated"] = dt_util.utcnow().isoformat()
