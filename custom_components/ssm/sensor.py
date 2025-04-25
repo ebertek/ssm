@@ -184,12 +184,14 @@ class SSMUVIndexSensor(SensorEntity):
 
     def _get_icon(self, uv_index):
         """Get the appropriate icon based on UV index value."""
-        if uv_index >= 8:
+        if uv_index >= 11:
+            return "mdi:fire"
+        elif uv_index >= 8:
             return "mdi:weather-sunny-alert"
         elif uv_index >= 6:
             return "mdi:weather-sunny"
         elif uv_index >= 3:
-            return "mdi:weather-partly-sunny"
+            return "mdi:weather-partly-cloudy"
         elif uv_index > 0:
             return "mdi:weather-sunny-off"
         else:
