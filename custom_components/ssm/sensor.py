@@ -314,22 +314,26 @@ class SSMSunTimeSensor(SensorEntity):
         return location.get("latitude") if location else None
 
     async def _get_uv_index(self, retries=5, delay=2):
-        """Fetch the current UV index from the UV sensor if available."""
-        for attempt in range(retries):
+        """Fetch the current UV index from the UV sensor, with retries."""
+        for attempt in range(1, retries + 1):
             try:
                 if not hasattr(self._uv_sensor, 'entity_id') or not self._uv_sensor.entity_id:
-                    return None
-
-                uv_state = self.hass.states.get(self._uv_sensor.entity_id)
-                if uv_state and uv_state.state not in (None, "unknown", "unavailable"):
-                    uv_index = uv_state.attributes.get("current_uv")
-                    if uv_index is not None:
-                        return int(round(float(uv_index)))
+                    _LOGGER.debug("UV sensor entity_id not ready (attempt %d/%d), retrying in %ds...", attempt, retries, delay)
+                else:
+                    uv_state = self.hass.states.get(self._uv_sensor.entity_id)
+                    if uv_state and uv_state.state not in (None, "unknown", "unavailable"):
+                        uv_index = uv_state.attributes.get("current_uv")
+                        if uv_index is not None:
+                            _LOGGER.debug("UV index successfully retrieved: %s (attempt %d)", uv_index, attempt)
+                            return int(round(float(uv_index)))
+                    else:
+                        _LOGGER.debug("UV sensor state unavailable (attempt %d/%d), retrying in %ds...", attempt, retries, delay)
             except Exception as e:
-                _LOGGER.warning("Error retrieving UV index on attempt %d: %s", attempt + 1, e)
+                _LOGGER.warning("Error retrieving UV index on attempt %d: %s", attempt, e)
 
-            _LOGGER.debug("UV index not ready (attempt %d), retrying in %ds...", attempt + 1, delay)
-            await asyncio.sleep(delay)
+            # Only wait if not on last attempt
+            if attempt < retries:
+                await asyncio.sleep(delay)
 
         _LOGGER.debug("UV index unavailable after %d attempts", retries)
         return None
