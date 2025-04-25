@@ -373,6 +373,7 @@ class SSMSunTimeSensor(SensorEntity):
                         self._attr_extra_state_attributes["shade_direct_sun"] = direct_sun if direct_sun else None
                         self._attr_extra_state_attributes["shade_partial"] = partial_shade if partial_shade else None
                         self._attr_extra_state_attributes["shade_full"] = full_shade if full_shade else None
+                        self._attr_extra_state_attributes["last_updated"] = dt_util.utcnow().isoformat()
                         self._attr_available = True
                     else:
                         _LOGGER.error("Unexpected format in /calculate response: %s", data_main)
@@ -419,7 +420,6 @@ class SSMSunTimeSensor(SensorEntity):
                         self._attr_extra_state_attributes["i_shade_direct_sun"] = i_direct_sun if i_direct_sun else None
                         self._attr_extra_state_attributes["i_shade_partial"] = i_partial_shade if i_partial_shade else None
                         self._attr_extra_state_attributes["i_shade_full"] = i_full_shade if i_full_shade else None
-                        self._attr_extra_state_attributes["last_updated"] = dt_util.utcnow().isoformat()
                 else:
                     _LOGGER.warning("Failed to fetch /calculatewithindex: %s", response_index.status)
         except Exception as e:
