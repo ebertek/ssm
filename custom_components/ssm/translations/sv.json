@@ -96,13 +96,22 @@
         "name": "Min soltid",
         "state_attributes": {
           "shade_direct_sun": {
-            "name": "I direkt solljus"
+            "name": "I direkt solljus (latitud)"
           },
           "shade_partial": {
-            "name": "I lite skugga"
+            "name": "I lite skugga (latitud)"
           },
           "shade_full": {
-            "name": "I mycket skugga"
+            "name": "I mycket skugga (latitud)"
+          },
+          "i_shade_direct_sun": {
+            "name": "I direkt solljus (index)"
+          },
+          "i_shade_partial": {
+            "name": "I lite skugga (index)"
+          },
+          "i_shade_full": {
+            "name": "I mycket skugga (index)"
           },
           "last_updated": {
             "name": "Senast uppdaterad"

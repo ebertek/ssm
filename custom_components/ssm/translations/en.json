@@ -96,13 +96,22 @@
         "name": "My time in the sun",
         "state_attributes": {
           "shade_direct_sun": {
-            "name": "In direct sun"
+            "name": "In direct sun (latitude)"
           },
           "shade_partial": {
-            "name": "In partial shade"
+            "name": "In partial shade (latitude)"
           },
           "shade_full": {
-            "name": "In full shade"
+            "name": "In full shade (latitude)"
+          },
+          "i_shade_direct_sun": {
+            "name": "In direct sun (index)"
+          },
+          "i_shade_partial": {
+            "name": "In partial shade (index)"
+          },
+          "i_shade_full": {
+            "name": "In full shade (index)"
           },
           "last_updated": {
             "name": "Last updated"

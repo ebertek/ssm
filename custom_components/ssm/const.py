@@ -41,13 +41,13 @@ STATIONS = [
 ]
 
 LOCATIONS = [
-    {"id": "sverige-gotland", "name": "Gotland"},
-    {"id": "sverige-goteborg", "name": "Göteborg"},
-    {"id": "sverige-malmo", "name": "Malmö"},
-    {"id": "sverige-stockholm", "name": "Stockholm"},
-    {"id": "sverige-polcirkeln", "name": "Polcirkeln"},
-    {"id": "sverige-oland", "name": "Öland"},
-    {"id": "sverige-ostersund", "name": "Östersund"},
+    {"id": "sverige-gotland", "name": "Gotland", "api_name": "Sverige (Gotland)", "latitude": "57.621875"},
+    {"id": "sverige-goteborg", "name": "Göteborg", "api_name": "Sverige (Göteborg)", "latitude": "57.70887"},
+    {"id": "sverige-malmo", "name": "Malmö", "api_name": "Sverige (Malmö)", "latitude": "55.60498"},
+    {"id": "sverige-polcirkeln", "name": "Polcirkeln", "api_name": "Sverige (polcirkeln)", "latitude": "66.54772"},
+    {"id": "sverige-stockholm", "name": "Stockholm", "api_name": "Sverige (Stockholm)", "latitude": "59.32893"},
+    {"id": "sverige-oland", "name": "Öland", "api_name": "Sverige (Öland)", "latitude": "58.866991"},
+    {"id": "sverige-ostersund", "name": "Östersund", "api_name": "Sverige (Östersund)", "latitude": "63.17668"},
 ]
 
 SKIN_TYPES = [

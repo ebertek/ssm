@@ -13,7 +13,7 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.util import dt as dt_util
 
-from .const import DOMAIN, CONF_STATION, CONF_LOCATION, CONF_SKIN_TYPE
+from .const import DOMAIN, CONF_STATION, CONF_LOCATION, CONF_SKIN_TYPE, LOCATIONS
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -43,7 +43,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
         # Only add sun time sensor if both location and skin_type are available
         if skin_type:
-            sun_time_sensor = SSMSunTimeSensor(hass, session, name, skin_type, uv_sensor, config_entry.entry_id)
+            sun_time_sensor = SSMSunTimeSensor(hass, session, name, skin_type, uv_sensor, location, config_entry.entry_id)
             entities.append(sun_time_sensor)
 
     if entities:
@@ -195,18 +195,10 @@ class SSMUVIndexSensor(SensorEntity):
         else:
             return "mdi:weather-night"
 
-    def _map_location_to_api_value(self, location):
-        """Map the location to the API value."""
-        mapping = {
-            "sverige-gotland": "Sverige (Gotland)",
-            "sverige-goteborg": "Sverige (Göteborg)",
-            "sverige-malmo": "Sverige (Malmö)",
-            "sverige-stockholm": "Sverige (Stockholm)",
-            "sverige-polcirkeln": "Sverige (polcirkeln)",
-            "sverige-oland": "Sverige (Öland)",
-            "sverige-ostersund": "Sverige (Östersund)",
-        }
-        return mapping.get(location, location)
+    def _get_api_location_name(self, location_id):
+      """Get the API location name for a given location ID."""
+      location = next((loc for loc in LOCATIONS if loc["id"] == location_id), None)
+      return location.get("api_name") if location else None
 
     async def async_update(self):
         """Get the latest data from the API and update the state."""
@@ -216,7 +208,7 @@ class SSMUVIndexSensor(SensorEntity):
             offset = "-2" if is_dst else "-1"
 
             # Map location to API value and URL encode it
-            api_location = self._map_location_to_api_value(self._location)
+            api_location = self._get_api_location_name(self._location)
             encoded_location = quote(api_location)
             url = f"https://www.stralsakerhetsmyndigheten.se/api/uvindex/{encoded_location}?offset={offset}"
 
@@ -283,13 +275,14 @@ class SSMSunTimeSensor(SensorEntity):
     _attr_icon = "mdi:sun-clock"
     _attr_translation_key = "min_soltid"
 
-    def __init__(self, hass, session, name, skin_type, uv_sensor, entry_id):
+    def __init__(self, hass, session, name, skin_type, uv_sensor, location, entry_id):
         """Initialize the sensor."""
         self.hass = hass
         self._session = session
         self._attr_name = "Min soltid"
         self._skin_type = skin_type
         self._uv_sensor = uv_sensor
+        self._location = location
         self._entry_id = entry_id
 
         self._attr_unique_id = f"{entry_id}_sun_time"
@@ -310,6 +303,11 @@ class SSMSunTimeSensor(SensorEntity):
             manufacturer="Swedish Radiation Safety Authority",
             model="Radiation and UV Monitor",
         )
+
+    def _get_location_latitude(self, location_id):
+      """Get the latitude for a given location ID."""
+      location = next((loc for loc in LOCATIONS if loc["id"] == location_id), None)
+      return location.get("latitude") if location else None
 
     async def _get_uv_state(self):
         """Helper method to fetch the UV entity state asynchronously."""
@@ -363,39 +361,85 @@ class SSMSunTimeSensor(SensorEntity):
                 self._attr_available = False
                 return
 
-            # Prepare request payload
-            payload = {
+            # Get latitude from location
+            latitude = self._get_location_latitude(self._location)
+            if not latitude:
+                _LOGGER.error("Latitude not found for location: %s", self._location)
+                self._attr_available = False
+                return
+
+            date_str = datetime.now().strftime("%Y-%m-%d")
+            hour_str = str(datetime.now().hour)
+
+            # Prepare request payloads
+            payload_main = {
+                "skintypeId": str(self._skin_type),
+                "latitude": latitude,
+                "dateStr": date_str,
+                "hour": hour_str,
+            }
+            payload_index = {
                 "skintypeId": str(self._skin_type),
                 "uvIndex": str(uv_index),
             }
 
-            _LOGGER.debug("Sending request to Sun Time API: %s", payload)
+            url_main = "https://www.stralsakerhetsmyndigheten.se/api/v1/suntime/calculate"
+            url_index= "https://www.stralsakerhetsmyndigheten.se/api/v1/suntime/calculatewithindex"
 
-            url = "https://www.stralsakerhetsmyndigheten.se/api/v1/suntime/calculatewithindex"
+            _LOGGER.debug("Sending request to Sun Time API (/calculate): %s", payload_main)
 
-            async with self._session.post(url, json=payload) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    _LOGGER.debug("Received Sun Time API response: %s", data)
+            async with self._session.post(url_main, json=payload_main) as response_main:
+                if response_main.status == 200:
+                    data_main = await response_main.json()
+                    _LOGGER.debug("Received Sun Time API /calculate response: %s", data_main)
 
-                    if "result" in data and "safeTimeResults" in data["result"]:
-                        safe_time_results = data["result"]["safeTimeResults"]
+                    if "result" in data_main and "safeTimeResults" in data_main["result"]:
+                        main_safe_time = data_main["result"]["safeTimeResults"]
 
-                        direct_sun = safe_time_results[0]["safeTime"]
-                        partial_shade = safe_time_results[1]["safeTime"]
-                        full_shade = safe_time_results[2]["safeTime"]
+                        direct_sun = main_safe_time[0]["safeTime"]
+                        partial_shade = main_safe_time[1]["safeTime"]
+                        full_shade = main_safe_time[2]["safeTime"]
 
                         self._attr_native_value = direct_sun if direct_sun else None
                         self._attr_extra_state_attributes["shade_direct_sun"] = direct_sun if direct_sun else None
                         self._attr_extra_state_attributes["shade_partial"] = partial_shade if partial_shade else None
                         self._attr_extra_state_attributes["shade_full"] = full_shade if full_shade else None
+                    else:
+                        _LOGGER.error("Invalid response from /calculate: %s", data_main)
+                        self._attr_native_value = None
+                        self._attr_available = False
+                        return
+                else:
+                    _LOGGER.error("Failed to fetch sun time from /calculate: %s", response_main.status)
+                    self._attr_native_value = None
+                    self._attr_available = False
+                    return
+
+
+            _LOGGER.debug("Sending request to Sun Time API (/calculatewithindex): %s", payload_index)
+
+            async with self._session.post(url_index, json=payload_index) as response_index:
+                if response_index.status == 200:
+                    data_index = await response_index.json()
+                    _LOGGER.debug("Received Sun Time API /calculatewithindex response: %s", data_index)
+
+                    if "result" in data_index and "safeTimeResults" in data_index["result"]:
+                        index_safe_time = data_index["result"]["safeTimeResults"]
+
+                        i_direct_sun = index_safe_time[0]["safeTime"]
+                        i_partial_shade = index_safe_time[1]["safeTime"]
+                        i_full_shade = index_safe_time[2]["safeTime"]
+
+                        self._attr_extra_state_attributes["i_shade_direct_sun"] = i_direct_sun if i_direct_sun else None
+                        self._attr_extra_state_attributes["i_shade_partial"] = i_partial_shade if i_partial_shade else None
+                        self._attr_extra_state_attributes["i_shade_full"] = i_full_shade if i_full_shade else None
                         self._attr_extra_state_attributes["last_updated"] = dt_util.utcnow().isoformat()
                         self._attr_available = True
                     else:
-                        _LOGGER.error("Unexpected API response format: %s", data)
+                        _LOGGER.error("Invalid resposne from /calculatewithindex: %s", data_index)
                         self._attr_available = False
                 else:
-                    _LOGGER.error("Failed to fetch sun time data: %s", response.status)
+                    _LOGGER.error("Failed to fetch sun time data from /calculatewithindex: %s", response_index.status)
                     self._attr_available = False
         except Exception as e:
             _LOGGER.error("Error updating Min Soltid sensor: %s", e, exc_info=True)

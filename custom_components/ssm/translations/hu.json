@@ -96,13 +96,22 @@
         "name": "Napon tölthető idő",
         "state_attributes": {
           "shade_direct_sun": {
-            "name": "Közvetlen napfényben"
+            "name": "Közvetlen napfényben (szélesség)"
           },
           "shade_partial": {
-            "name": "Részleges árnyékban"
+            "name": "Részleges árnyékban (szélesség)"
           },
           "shade_full": {
-            "name": "Teljes árnyékban"
+            "name": "Teljes árnyékban (szélesség)"
+          },
+          "i_shade_direct_sun": {
+            "name": "Közvetlen napfényben (index)"
+          },
+          "i_shade_partial": {
+            "name": "Részleges árnyékban (index)"
+          },
+          "i_shade_full": {
+            "name": "Teljes árnyékban (index)"
           },
           "last_updated": {
             "name": "Utoljára frissítve"
