@@ -293,10 +293,12 @@ class SSMSunTimeSensor(SensorEntity):
             "shade_direct_sun": None,
             "shade_partial": None,
             "shade_full": None,
+            "i_shade_direct_sun": None,
+            "i_shade_partial": None,
+            "i_shade_full": None,
             "last_updated": None,
         }
 
-        # Define device info
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, entry_id)},
             name=name,
@@ -305,89 +307,54 @@ class SSMSunTimeSensor(SensorEntity):
         )
 
     def _get_location_latitude(self, location_id):
-      """Get the latitude for a given location ID."""
-      location = next((loc for loc in LOCATIONS if loc["id"] == location_id), None)
-      return location.get("latitude") if location else None
+        """Get the latitude for a given location ID."""
+        location = next((loc for loc in LOCATIONS if loc["id"] == location_id), None)
+        return location.get("latitude") if location else None
 
-    async def _get_uv_state(self):
-        """Helper method to fetch the UV entity state asynchronously."""
-        # Wait until the UV sensor and its entity_id become available
-        while (not hasattr(self, '_uv_sensor') or self._uv_sensor is None or not hasattr(self._uv_sensor, 'entity_id') or self._uv_sensor.entity_id is None):
-            _LOGGER.debug("Waiting for UV sensor reference to become available...")
-            await asyncio.sleep(2)  # Wait 2 seconds before checking again
+    async def _get_uv_index(self):
+        """Fetch the current UV index from the UV sensor if available."""
+        try:
+            if not hasattr(self._uv_sensor, 'entity_id') or not self._uv_sensor.entity_id:
+                return None
 
-        uv_entity_id = self._uv_sensor.entity_id
-        uv_state = self.hass.states.get(uv_entity_id)
+            uv_state = self.hass.states.get(self._uv_sensor.entity_id)
+            if not uv_state or uv_state.state in (None, "unknown", "unavailable"):
+                return None
 
-        while uv_state is None:
-            _LOGGER.debug("Waiting for state of %s to be available...", uv_entity_id)
-            await asyncio.sleep(2)
-            uv_state = self.hass.states.get(uv_entity_id)
+            uv_index = uv_state.attributes.get("current_uv")
+            if uv_index is None:
+                return None
 
-        return uv_state
+            return int(round(float(uv_index)))
+        except Exception as e:
+            _LOGGER.warning("Error getting UV index from sensor: %s", e)
+            return None
 
     async def async_update(self):
         """Get the latest data from the API and update the state."""
+        stockholm = ZoneInfo("Europe/Stockholm")
+        now = datetime.now(stockholm)
+
+        latitude = self._get_location_latitude(self._location)
+        if not latitude:
+            _LOGGER.error("Latitude not found for location: %s", self._location)
+            self._attr_available = False
+            return
+
+        date_str = datetime.now().strftime("%Y-%m-%d")
+        hour_str = str(datetime.now().hour)
+
+        payload_main = {
+            "skintypeId": str(self._skin_type),
+            "latitude": latitude,
+            "dateStr": date_str,
+            "hour": hour_str,
+        }
+
+        url_main = "https://www.stralsakerhetsmyndigheten.se/api/v1/suntime/calculate"
+        _LOGGER.debug("Sending request to Sun Time API (/calculate): %s", payload_main)
+
         try:
-            # Get the latest UV index from the UV sensor
-            try:
-                uv_state = await asyncio.wait_for(self._get_uv_state(), timeout=30)
-            except asyncio.TimeoutError:
-                _LOGGER.error("Timeout waiting for UV sensor state")
-                self._attr_available = False
-                return
-
-            if not uv_state:
-                _LOGGER.warning("UV Index sensor state could not be retrieved, skipping Min Soltid update")
-                self._attr_available = False
-                return
-
-            if uv_state.state in (None, "unknown", "unavailable"):
-                _LOGGER.warning("UV Index sensor state is %s, skipping Min Soltid update", uv_state.state)
-                self._attr_available = False
-                return
-
-            uv_index = uv_state.attributes.get("current_uv")
-
-            if uv_index is None:
-                _LOGGER.error("UV Index sensor missing 'current_uv' attribute.")
-                self._attr_available = False
-                return
-
-            try:
-                uv_index = int(round(float(uv_index)))  # Convert to integer
-            except ValueError:
-                _LOGGER.error("Invalid UV index value: %s", uv_index)
-                self._attr_available = False
-                return
-
-            # Get latitude from location
-            latitude = self._get_location_latitude(self._location)
-            if not latitude:
-                _LOGGER.error("Latitude not found for location: %s", self._location)
-                self._attr_available = False
-                return
-
-            date_str = datetime.now().strftime("%Y-%m-%d")
-            hour_str = str(datetime.now().hour)
-
-            # Prepare request payloads
-            payload_main = {
-                "skintypeId": str(self._skin_type),
-                "latitude": latitude,
-                "dateStr": date_str,
-                "hour": hour_str,
-            }
-            payload_index = {
-                "skintypeId": str(self._skin_type),
-                "uvIndex": str(uv_index),
-            }
-
-            url_main = "https://www.stralsakerhetsmyndigheten.se/api/v1/suntime/calculate"
-            url_index= "https://www.stralsakerhetsmyndigheten.se/api/v1/suntime/calculatewithindex"
-
-            _LOGGER.debug("Sending request to Sun Time API (/calculate): %s", payload_main)
-
             async with self._session.post(url_main, json=payload_main) as response_main:
                 if response_main.status == 200:
                     data_main = await response_main.json()
@@ -404,20 +371,37 @@ class SSMSunTimeSensor(SensorEntity):
                         self._attr_extra_state_attributes["shade_direct_sun"] = direct_sun if direct_sun else None
                         self._attr_extra_state_attributes["shade_partial"] = partial_shade if partial_shade else None
                         self._attr_extra_state_attributes["shade_full"] = full_shade if full_shade else None
+                        self._attr_available = True
                     else:
-                        _LOGGER.error("Invalid response from /calculate: %s", data_main)
+                        _LOGGER.error("Unexpected format in /calculate response: %s", data_main)
                         self._attr_native_value = None
                         self._attr_available = False
                         return
                 else:
-                    _LOGGER.error("Failed to fetch sun time from /calculate: %s", response_main.status)
+                    _LOGGER.error("Failed to fetch /calculate: %s", response_main.status)
                     self._attr_native_value = None
                     self._attr_available = False
                     return
+        except Exception as e:
+            _LOGGER.error("Error calling /calculate: %s", e)
+            self._attr_available = False
+            return
 
+        # Optional: enrich with /calculatewithindex if UV index is available
+        uv_index = await self._get_uv_index()
+        if uv_index is None:
+            _LOGGER.debug("Skipping /calculatewithindex due to unavailable UV index.")
+            return
 
-            _LOGGER.debug("Sending request to Sun Time API (/calculatewithindex): %s", payload_index)
+        payload_index = {
+            "skintypeId": str(self._skin_type),
+            "uvIndex": str(uv_index),
+        }
 
+        url_index = "https://www.stralsakerhetsmyndigheten.se/api/v1/suntime/calculatewithindex"
+        _LOGGER.debug("Sending request to Sun Time API (/calculatewithindex): %s", payload_index)
+
+        try:
             async with self._session.post(url_index, json=payload_index) as response_index:
                 if response_index.status == 200:
                     data_index = await response_index.json()
@@ -434,13 +418,7 @@ class SSMSunTimeSensor(SensorEntity):
                         self._attr_extra_state_attributes["i_shade_partial"] = i_partial_shade if i_partial_shade else None
                         self._attr_extra_state_attributes["i_shade_full"] = i_full_shade if i_full_shade else None
                         self._attr_extra_state_attributes["last_updated"] = dt_util.utcnow().isoformat()
-                        self._attr_available = True
-                    else:
-                        _LOGGER.error("Invalid resposne from /calculatewithindex: %s", data_index)
-                        self._attr_available = False
                 else:
-                    _LOGGER.error("Failed to fetch sun time data from /calculatewithindex: %s", response_index.status)
-                    self._attr_available = False
+                    _LOGGER.warning("Failed to fetch /calculatewithindex: %s", response_index.status)
         except Exception as e:
-            _LOGGER.error("Error updating Min Soltid sensor: %s", e, exc_info=True)
-            self._attr_available = False
+            _LOGGER.warning("Error calling /calculatewithindex: %s", e)
