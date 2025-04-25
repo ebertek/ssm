@@ -1,9 +1,10 @@
 """Sensor platform for Swedish Radiation Safety Authority integration."""
 import asyncio
-from datetime import timedelta, datetime
+from datetime import datetime, time as dt_time, timedelta
 import logging
 import time
 from urllib.parse import quote
+from zoneinfo import ZoneInfo
 
 from homeassistant.components.sensor import SensorEntity, SensorStateClass
 from homeassistant.config_entries import ConfigEntry
@@ -87,11 +88,13 @@ class SSMRadiationSensor(SensorEntity):
     async def async_update(self):
         """Get the latest data from the API and update the state."""
         try:
-            # Get timezone-aware local time; SSM API returns UTC in response, but expects local time in request
-            # TODO: Confirm if API actually expects local time or Sweden time (CET in winter, CEST in summer)
-            now = dt_util.now()
-            # Get local midnight (00:00 today)
-            start_of_day = now.replace(hour=0, minute=0, second=0, microsecond=0)
+            # Get timezone-aware local time; theory is that SSM API returns UTC in response, but expects Sweden time in request
+            # TODO: Confirm if API actually expects Sweden time (CET in winter, CEST in summer) or local time
+            # Explicitly use Stockholm time (handles DST transitions correctly)
+            stockholm = ZoneInfo("Europe/Stockholm")
+            now = datetime.now(stockholm)
+            # Get midnight (00:00 today) in Stockholm time
+            start_of_day = datetime.combine(now.date(), dt_time.min, tzinfo=stockholm)
             # Convert to Unix timestamps in milliseconds
             start_timestamp = int(start_of_day.timestamp() * 1000)
             end_timestamp = int(now.timestamp() * 1000)
