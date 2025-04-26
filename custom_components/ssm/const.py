@@ -10,7 +10,7 @@ CONF_LOCATION = "location"
 CONF_SKIN_TYPE = "skin_type"
 DEFAULT_NAME = "SSM"
 
-# Predefined stations with their location IDs
+# Radiation measurement stations with their location IDs
 STATIONS = [
     {"id": "20", "name": "Bjuruklubb (Skellefteå)"},
     {"id": "5", "name": "Brämön"},
@@ -42,6 +42,7 @@ STATIONS = [
     {"id": "13", "name": "Ölands Södra Udde"},
 ]
 
+# UV index measurement locations with their API names and values
 LOCATIONS = [
     {"id": "sverige-gotland", "name": "Gotland", "api_name": "Sverige (Gotland)", "latitude": "57.621875"},
     {"id": "sverige-goteborg", "name": "Göteborg", "api_name": "Sverige (Göteborg)", "latitude": "57.70887"},
@@ -52,6 +53,7 @@ LOCATIONS = [
     {"id": "sverige-ostersund", "name": "Östersund", "api_name": "Sverige (Östersund)", "latitude": "63.17668"},
 ]
 
+# Skin types for Min soltid calculations
 SKIN_TYPES = [
     {"id": "1", "name": "Type 1 (Very fair, burns easily)"},
     {"id": "2", "name": "Type 2 (Fair, burns easily)"},
