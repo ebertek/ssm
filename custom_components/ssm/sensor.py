@@ -3,7 +3,7 @@
 # pylint: disable=C0301, E0401, R0902, R0903, R0913, R0914, R0915, R0917, W0511, W0718
 
 import asyncio
-from datetime import datetime, time as dt_time, timedelta
+from datetime import datetime, timedelta
 import logging
 import time
 from urllib.parse import quote
@@ -87,16 +87,18 @@ class SSMRadiationSensor(SensorEntity):
     async def async_update(self):
         """Get the latest data from the API and update the state."""
         try:
-            # Get timezone-aware local time; theory is that SSM API returns UTC in response, but expects Sweden time in request
-            # TODO: Confirm if API actually expects Sweden time (CET in winter, CEST in summer) or local time
             # Explicitly use Stockholm time (handles DST transitions correctly)
             stockholm = ZoneInfo("Europe/Stockholm")
             now = datetime.now(stockholm)
-            # Get midnight (00:00 today) in Stockholm time
-            start_of_day = datetime.combine(now.date(), dt_time.min, tzinfo=stockholm)
+            is_dst = bool(now.dst())
+
+            # Fetch the last two values
+            end = now.replace(minute=0, second=0, microsecond=0)
+            start = end - timedelta(hours=3 if is_dst else 2)
+
             # Convert to Unix timestamps in milliseconds
-            start_timestamp = int(start_of_day.timestamp() * 1000)
-            end_timestamp = int(now.timestamp() * 1000)
+            start_timestamp = int(start.timestamp() * 1000)
+            end_timestamp = int(end.timestamp() * 1000)
 
             url = f"https://karttjanst.ssm.se/data/getHistoryForStation?locationId={self._station}&start={start_timestamp}&end={end_timestamp}"
 
