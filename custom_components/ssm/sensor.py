@@ -73,9 +73,6 @@ class SSMRadiationSensor(SensorEntity):
         self._attr_available = True
 
         self._attr_extra_state_attributes = {
-            "min_level": None,
-            "max_level": None,
-            "avg_level": None,
             "last_updated": None,
         }
 
@@ -116,9 +113,6 @@ class SSMRadiationSensor(SensorEntity):
 
                         # Convert from μSv/h to nSv/h
                         self._attr_native_value = round(radiation_values[-1] * 1000)  # Most recent value
-                        self._attr_extra_state_attributes["min_level"] = round(min(radiation_values) * 1000)
-                        self._attr_extra_state_attributes["max_level"] = round(max(radiation_values) * 1000)
-                        self._attr_extra_state_attributes["avg_level"] = round(sum(radiation_values) / len(radiation_values) * 1000)
                         self._attr_extra_state_attributes["last_updated"] = dt_util.utcnow().isoformat()
                         self._attr_available = True
                     else:
