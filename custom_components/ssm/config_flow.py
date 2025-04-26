@@ -80,6 +80,7 @@ class SSMConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     data=user_input,
                 )
             except Exception:
+                _LOGGER.debug("Failed user input: %s", user_input)
                 errors["base"] = "cannot_connect"
 
         # Create dropdown options for location ID
