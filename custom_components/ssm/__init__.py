@@ -15,7 +15,7 @@ _LOGGER = logging.getLogger(__name__)
 
 PLATFORMS = [Platform.SENSOR]
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up SSM from a config entry."""
     _LOGGER.debug("Setting up SSM integration with entry_id: %s", entry.entry_id)
 
@@ -53,5 +53,8 @@ async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Reload config entry."""
     _LOGGER.debug("Reloading SSM integration with entry_id: %s", entry.entry_id)
 
-    await async_unload_entry(hass, entry)
-    await async_setup_entry(hass, entry)
+    unload_ok = await async_unload_entry(hass, entry)
+    if unload_ok:
+        await async_setup_entry(hass, entry)
+    else:
+        _LOGGER.error("Failed to unload before reload of entry_id: %s", entry.entry_id)
