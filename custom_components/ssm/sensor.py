@@ -1,6 +1,6 @@
 """Sensor platform for Swedish Radiation Safety Authority integration."""
 
-# pylint: disable=C0301, E0401, R0902, R0903, R0913, R0914, R0915, R0917, W0511, W0718
+# pylint: disable=C0301, E0401, R0902, R0903, R0912, R0913, R0914, R0915, R0917, W0511, W0718
 
 import asyncio
 from datetime import datetime, timedelta
@@ -369,24 +369,20 @@ class SSMSunTimeSensor(SensorEntity):
                     data = await response.json()
                     _LOGGER.debug("Received response from Sun Time API (/calculate): %s", data)
 
-                    if "result" in data and "safeTimeResults" in data["result"]:
-                        main_safe_time = data["result"]["safeTimeResults"]
+                    safe_times = {"direkt solljus": None, "lite skugga": None, "mycket skugga": None}
 
-                        direct_sun = main_safe_time[0]["safeTime"]
-                        partial_shade = main_safe_time[1]["safeTime"]
-                        full_shade = main_safe_time[2]["safeTime"]
+                    for item in data.get("result", {}).get("safeTimeResults", []):
+                        desc = item.get("shadowDescription", "").lower()
+                        for key in safe_times:
+                            if key in desc:
+                                safe_times[key] = item.get("safeTime")
 
-                        self._attr_native_value = direct_sun if direct_sun else None
-                        self._attr_extra_state_attributes["shade_direct_sun"] = direct_sun if direct_sun else None
-                        self._attr_extra_state_attributes["shade_partial"] = partial_shade if partial_shade else None
-                        self._attr_extra_state_attributes["shade_full"] = full_shade if full_shade else None
-                        self._attr_extra_state_attributes["last_updated"] = dt_util.utcnow().isoformat()
-                        self._attr_available = True
-                    else:
-                        _LOGGER.error("Unexpected format in Sun Time API (/calculate) response: %s", data)
-                        self._attr_native_value = None
-                        self._attr_available = False
-                        return
+                    self._attr_native_value = safe_times.get("direkt solljus")
+                    self._attr_extra_state_attributes["shade_direct_sun"] = safe_times.get("direkt solljus")
+                    self._attr_extra_state_attributes["shade_partial"] = safe_times.get("lite skugga")
+                    self._attr_extra_state_attributes["shade_full"] = safe_times.get("mycket skugga")
+                    self._attr_extra_state_attributes["last_updated"] = dt_util.utcnow().isoformat()
+                    self._attr_available = True
                 else:
                     _LOGGER.error("Failed to fetch Sun Time API (/calculate) response: %s", response.status)
                     self._attr_native_value = None
@@ -397,7 +393,7 @@ class SSMSunTimeSensor(SensorEntity):
             self._attr_available = False
             return
 
-        # Optional: enrich with /calculatewithindex if UV index is available
+        # Enrich with /calculatewithindex if UV index is available
         uv_index = await self._get_uv_index()
         if uv_index is None:
             _LOGGER.debug("Skipping Sun Time API (/calculatewithindex) due to unavailable UV index.")
@@ -417,16 +413,17 @@ class SSMSunTimeSensor(SensorEntity):
                     data = await response.json()
                     _LOGGER.debug("Received response from Sun Time API (/calculatewithindex): %s", data)
 
-                    if "result" in data and "safeTimeResults" in data["result"]:
-                        index_safe_time = data["result"]["safeTimeResults"]
+                    safe_times = {"direkt solljus": None, "lite skugga": None, "mycket skugga": None}
 
-                        i_direct_sun = index_safe_time[0]["safeTime"]
-                        i_partial_shade = index_safe_time[1]["safeTime"]
-                        i_full_shade = index_safe_time[2]["safeTime"]
+                    for item in data.get("result", {}).get("safeTimeResults", []):
+                        desc = item.get("shadowDescription", "").lower()
+                        for key in safe_times:
+                            if key in desc:
+                                safe_times[key] = item.get("safeTime")
 
-                        self._attr_extra_state_attributes["i_shade_direct_sun"] = i_direct_sun if i_direct_sun else None
-                        self._attr_extra_state_attributes["i_shade_partial"] = i_partial_shade if i_partial_shade else None
-                        self._attr_extra_state_attributes["i_shade_full"] = i_full_shade if i_full_shade else None
+                    self._attr_extra_state_attributes["i_shade_direct_sun"] = safe_times.get("direkt solljus")
+                    self._attr_extra_state_attributes["i_shade_partial"] = safe_times.get("lite skugga")
+                    self._attr_extra_state_attributes["i_shade_full"] = safe_times.get("mycket skugga")
                 else:
                     _LOGGER.warning("Failed to fetch Sun Time API (/calculatewithindex) response: %s", response.status)
         except Exception as e:
