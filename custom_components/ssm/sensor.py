@@ -341,6 +341,15 @@ class SSMSunTimeSensor(SensorEntity):
         _LOGGER.debug("UV index unavailable after %d attempts", retries)
         return None
 
+    def _parse_safe_times(self, results):
+        safe_times = {"direkt solljus": None, "lite skugga": None, "mycket skugga": None}
+        for item in results:
+            desc = item.get("shadowDescription", "").lower()
+            for key in safe_times:
+                if key in desc:
+                    safe_times[key] = item.get("safeTime")
+        return safe_times
+
     async def async_update(self):
         """Get the latest data from the API and update the state."""
 
@@ -369,13 +378,7 @@ class SSMSunTimeSensor(SensorEntity):
                     data = await response.json()
                     _LOGGER.debug("Received response from Sun Time API (/calculate): %s", data)
 
-                    safe_times = {"direkt solljus": None, "lite skugga": None, "mycket skugga": None}
-
-                    for item in data.get("result", {}).get("safeTimeResults", []):
-                        desc = item.get("shadowDescription", "").lower()
-                        for key in safe_times:
-                            if key in desc:
-                                safe_times[key] = item.get("safeTime")
+                    safe_times = self._parse_safe_times(data.get("result", {}).get("safeTimeResults", []))
 
                     self._attr_native_value = safe_times.get("direkt solljus")
                     self._attr_extra_state_attributes["shade_direct_sun"] = safe_times.get("direkt solljus")
@@ -413,13 +416,7 @@ class SSMSunTimeSensor(SensorEntity):
                     data = await response.json()
                     _LOGGER.debug("Received response from Sun Time API (/calculatewithindex): %s", data)
 
-                    safe_times = {"direkt solljus": None, "lite skugga": None, "mycket skugga": None}
-
-                    for item in data.get("result", {}).get("safeTimeResults", []):
-                        desc = item.get("shadowDescription", "").lower()
-                        for key in safe_times:
-                            if key in desc:
-                                safe_times[key] = item.get("safeTime")
+                    safe_times = self._parse_safe_times(data.get("result", {}).get("safeTimeResults", []))
 
                     self._attr_extra_state_attributes["i_shade_direct_sun"] = safe_times.get("direkt solljus")
                     self._attr_extra_state_attributes["i_shade_partial"] = safe_times.get("lite skugga")
