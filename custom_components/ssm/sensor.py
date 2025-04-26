@@ -311,7 +311,7 @@ class SSMSunTimeSensor(SensorEntity):
             model="Radiation and UV Monitor",
         )
 
-    def _get_location_latitude(self, location_id):
+    def _get_location_latitude(self, location_id: str):
         """Get the latitude for a given location ID."""
         location = next((loc for loc in LOCATIONS if loc["id"] == location_id), None)
         return location.get("latitude") if location else None
