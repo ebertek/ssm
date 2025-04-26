@@ -1,4 +1,7 @@
 """Sensor platform for Swedish Radiation Safety Authority integration."""
+
+# pylint: disable=C0301, E0401, R0902, R0903, R0913, R0914, R0915, R0917, W0511, W0718
+
 import asyncio
 from datetime import datetime, time as dt_time, timedelta
 import logging
@@ -6,12 +9,11 @@ import time
 from urllib.parse import quote
 from zoneinfo import ZoneInfo
 
-from homeassistant.components.sensor import SensorEntity, SensorStateClass
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_NAME
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.entity import DeviceInfo
-from homeassistant.util import dt as dt_util
+from homeassistant.components.sensor import SensorEntity, SensorStateClass # type: ignore
+from homeassistant.const import CONF_NAME # type: ignore
+from homeassistant.helpers.aiohttp_client import async_get_clientsession # type: ignore
+from homeassistant.helpers.entity import DeviceInfo # type: ignore
+from homeassistant.util import dt as dt_util # type: ignore
 
 from .const import DOMAIN, CONF_STATION, CONF_LOCATION, CONF_SKIN_TYPE, LOCATIONS
 
@@ -106,7 +108,7 @@ class SSMRadiationSensor(SensorEntity):
             async with self._session.get(url) as response:
                 if response.status == 200:
                     data = await response.json()
-                    _LOGGER.debug("Received Radiation API response: %s", data)
+                    _LOGGER.debug("Received response from Radiation API: %s", data)
 
                     if "values" in data and data["values"]:
                         values = data["values"]
@@ -120,7 +122,7 @@ class SSMRadiationSensor(SensorEntity):
                         self._attr_extra_state_attributes["last_updated"] = dt_util.utcnow().isoformat()
                         self._attr_available = True
                     else:
-                        _LOGGER.error("Invalid data format received from SSM Radiation API")
+                        _LOGGER.error("Invalid data format received from SSM Radiation API: %s", data)
                         self._attr_available = False
                 else:
                     _LOGGER.error("Failed to fetch radiation data from SSM API: %s", response.status)
@@ -172,13 +174,13 @@ class SSMUVIndexSensor(SensorEntity):
         """Get the UV risk level based on the index value."""
         if uv_index >= 11:
             return "extreme"
-        elif uv_index >= 8:
+        if uv_index >= 8:
             return "very_high"
-        elif uv_index >= 6:
+        if uv_index >= 6:
             return "high"
-        elif uv_index >= 3:
+        if uv_index >= 3:
             return "moderate"
-        elif uv_index > 0:
+        if uv_index > 0:
             return "low"
         return "none"
 
@@ -186,21 +188,20 @@ class SSMUVIndexSensor(SensorEntity):
         """Get the appropriate icon based on UV index value."""
         if uv_index >= 11:
             return "mdi:fire"
-        elif uv_index >= 8:
+        if uv_index >= 8:
             return "mdi:weather-sunny-alert"
-        elif uv_index >= 6:
+        if uv_index >= 6:
             return "mdi:weather-sunny"
-        elif uv_index >= 3:
+        if uv_index >= 3:
             return "mdi:weather-partly-cloudy"
-        elif uv_index > 0:
+        if uv_index > 0:
             return "mdi:weather-sunny-off"
-        else:
-            return "mdi:weather-night"
+        return "mdi:weather-night"
 
     def _get_api_location_name(self, location_id):
-      """Get the API location name for a given location ID."""
-      location = next((loc for loc in LOCATIONS if loc["id"] == location_id), None)
-      return location.get("api_name") if location else None
+        """Get the API location name for a given location ID."""
+        location = next((loc for loc in LOCATIONS if loc["id"] == location_id), None)
+        return location.get("api_name") if location else None
 
     async def async_update(self):
         """Get the latest data from the API and update the state."""
@@ -219,7 +220,7 @@ class SSMUVIndexSensor(SensorEntity):
             async with self._session.get(url) as response:
                 if response.status == 200:
                     data = await response.json()
-                    _LOGGER.debug("Received UV Index API response: %s", data)
+                    _LOGGER.debug("Received response from UV Index API: %s", data)
 
                     if "response" in data and "location" in data["response"] and "date" in data["response"]["location"]:
                         location_data = data["response"]["location"]
@@ -265,7 +266,7 @@ class SSMUVIndexSensor(SensorEntity):
 
                         self._attr_available = True
                     else:
-                        _LOGGER.error("Invalid data format received from SSM UV Index API")
+                        _LOGGER.error("Invalid data format received from SSM UV Index API: %s", data)
                         self._attr_available = False
                 else:
                     _LOGGER.error("Failed to fetch UV index data from SSM API: %s", response.status)
@@ -324,7 +325,7 @@ class SSMSunTimeSensor(SensorEntity):
         for attempt in range(1, retries + 1):
             try:
                 if not hasattr(self._uv_sensor, 'entity_id') or not self._uv_sensor.entity_id:
-                    _LOGGER.debug("UV sensor entity_id not ready (attempt %d/%d), retrying in %ds...", attempt, retries, delay)
+                    _LOGGER.debug("UV sensor not ready (attempt %d/%d), retrying in %ds...", attempt, retries, delay)
                 else:
                     uv_state = self.hass.states.get(self._uv_sensor.entity_id)
                     if uv_state and uv_state.state not in (None, "unknown", "unavailable"):
@@ -346,8 +347,6 @@ class SSMSunTimeSensor(SensorEntity):
 
     async def async_update(self):
         """Get the latest data from the API and update the state."""
-        stockholm = ZoneInfo("Europe/Stockholm")
-        now = datetime.now(stockholm)
 
         latitude = self._get_location_latitude(self._location)
         if not latitude:
@@ -358,24 +357,24 @@ class SSMSunTimeSensor(SensorEntity):
         date_str = datetime.now().strftime("%Y-%m-%d")
         hour_str = str(datetime.now().hour)
 
-        payload_main = {
+        payload = {
             "skintypeId": str(self._skin_type),
             "latitude": latitude,
             "dateStr": date_str,
             "hour": hour_str,
         }
 
-        url_main = "https://www.stralsakerhetsmyndigheten.se/api/v1/suntime/calculate"
-        _LOGGER.debug("Sending request to Sun Time API (/calculate): %s", payload_main)
+        url = "https://www.stralsakerhetsmyndigheten.se/api/v1/suntime/calculate"
+        _LOGGER.debug("Sending request to Sun Time API (/calculate): %s", payload)
 
         try:
-            async with self._session.post(url_main, json=payload_main) as response_main:
-                if response_main.status == 200:
-                    data_main = await response_main.json()
-                    _LOGGER.debug("Received Sun Time API /calculate response: %s", data_main)
+            async with self._session.post(url, json=payload) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    _LOGGER.debug("Received response from Sun Time API (/calculate): %s", data)
 
-                    if "result" in data_main and "safeTimeResults" in data_main["result"]:
-                        main_safe_time = data_main["result"]["safeTimeResults"]
+                    if "result" in data and "safeTimeResults" in data["result"]:
+                        main_safe_time = data["result"]["safeTimeResults"]
 
                         direct_sun = main_safe_time[0]["safeTime"]
                         partial_shade = main_safe_time[1]["safeTime"]
@@ -388,42 +387,42 @@ class SSMSunTimeSensor(SensorEntity):
                         self._attr_extra_state_attributes["last_updated"] = dt_util.utcnow().isoformat()
                         self._attr_available = True
                     else:
-                        _LOGGER.error("Unexpected format in /calculate response: %s", data_main)
+                        _LOGGER.error("Unexpected format in Sun Time API (/calculate) response: %s", data)
                         self._attr_native_value = None
                         self._attr_available = False
                         return
                 else:
-                    _LOGGER.error("Failed to fetch /calculate: %s", response_main.status)
+                    _LOGGER.error("Failed to fetch Sun Time API (/calculate) response: %s", response.status)
                     self._attr_native_value = None
                     self._attr_available = False
                     return
         except Exception as e:
-            _LOGGER.error("Error calling /calculate: %s", e)
+            _LOGGER.error("Error calling Sun Time API (/calculate): %s", e)
             self._attr_available = False
             return
 
         # Optional: enrich with /calculatewithindex if UV index is available
         uv_index = await self._get_uv_index()
         if uv_index is None:
-            _LOGGER.debug("Skipping /calculatewithindex due to unavailable UV index.")
+            _LOGGER.debug("Skipping Sun Time API (/calculatewithindex) due to unavailable UV index.")
             return
 
-        payload_index = {
+        payload = {
             "skintypeId": str(self._skin_type),
             "uvIndex": str(uv_index),
         }
 
-        url_index = "https://www.stralsakerhetsmyndigheten.se/api/v1/suntime/calculatewithindex"
-        _LOGGER.debug("Sending request to Sun Time API (/calculatewithindex): %s", payload_index)
+        url = "https://www.stralsakerhetsmyndigheten.se/api/v1/suntime/calculatewithindex"
+        _LOGGER.debug("Sending request to Sun Time API (/calculatewithindex): %s", payload)
 
         try:
-            async with self._session.post(url_index, json=payload_index) as response_index:
-                if response_index.status == 200:
-                    data_index = await response_index.json()
-                    _LOGGER.debug("Received Sun Time API /calculatewithindex response: %s", data_index)
+            async with self._session.post(url, json=payload) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    _LOGGER.debug("Received response from Sun Time API (/calculatewithindex): %s", data)
 
-                    if "result" in data_index and "safeTimeResults" in data_index["result"]:
-                        index_safe_time = data_index["result"]["safeTimeResults"]
+                    if "result" in data and "safeTimeResults" in data["result"]:
+                        index_safe_time = data["result"]["safeTimeResults"]
 
                         i_direct_sun = index_safe_time[0]["safeTime"]
                         i_partial_shade = index_safe_time[1]["safeTime"]
@@ -433,6 +432,6 @@ class SSMSunTimeSensor(SensorEntity):
                         self._attr_extra_state_attributes["i_shade_partial"] = i_partial_shade if i_partial_shade else None
                         self._attr_extra_state_attributes["i_shade_full"] = i_full_shade if i_full_shade else None
                 else:
-                    _LOGGER.warning("Failed to fetch /calculatewithindex: %s", response_index.status)
+                    _LOGGER.warning("Failed to fetch Sun Time API (/calculatewithindex) response: %s", response.status)
         except Exception as e:
-            _LOGGER.warning("Error calling /calculatewithindex: %s", e)
+            _LOGGER.warning("Error calling Sun Time API (/calculatewithindex): %s", e)

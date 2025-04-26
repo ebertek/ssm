@@ -1,5 +1,7 @@
 """Constants for the Swedish Radiation Safety Authority integration."""
 
+# pylint: disable=C0301
+
 DOMAIN = "ssm"
 
 # Configuration constants

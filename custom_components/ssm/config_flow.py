@@ -1,17 +1,17 @@
 """Config flow for Swedish Radiation Safety Authority integration."""
-import logging
-import voluptuous as vol
-from typing import Any, Dict, Optional
 
-from homeassistant import config_entries
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.const import CONF_NAME
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
-import homeassistant.helpers.config_validation as cv
-from homeassistant.helpers.selector import (
-    SelectSelector,
-    SelectSelectorConfig
-)
+# pylint: disable=C0301, E0401, R0903, W0718, W0719
+
+import logging
+from typing import Any, Dict
+
+import voluptuous as vol # type: ignore
+
+from homeassistant import config_entries # type: ignore
+from homeassistant.core import HomeAssistant, callback # type: ignore
+from homeassistant.const import CONF_NAME # type: ignore
+from homeassistant.helpers.aiohttp_client import async_get_clientsession # type: ignore
+from homeassistant.helpers.selector import SelectSelector, SelectSelectorConfig # type: ignore
 
 from .const import (
     DOMAIN,
@@ -70,11 +70,11 @@ class SSMConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             try:
                 info = await validate_input(self.hass, user_input)
-                
+
                 # Create a unique ID from name + location ID and location
                 await self.async_set_unique_id(f"{user_input[CONF_NAME]}_{user_input.get(CONF_STATION)}_{user_input.get(CONF_LOCATION)}")
                 self._abort_if_unique_id_configured()
-                
+
                 return self.async_create_entry(
                     title=info["title"],
                     data=user_input,
@@ -149,7 +149,7 @@ class SSMOptionsFlow(config_entries.OptionsFlow):
     async def async_step_init(self, user_input=None):
         """Manage the options."""
         _LOGGER.debug("Options flow started")
-        
+
         if user_input is not None:
             _LOGGER.debug("User input received: %s", user_input)
             # Remove empty fields to make them truly optional
