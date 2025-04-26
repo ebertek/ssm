@@ -4,33 +4,16 @@
 
 import logging
 
-import voluptuous as vol # type: ignore
-
 from homeassistant.config_entries import ConfigEntry # type: ignore
 from homeassistant.const import Platform, CONF_NAME # type: ignore
 from homeassistant.core import HomeAssistant # type: ignore
 import homeassistant.helpers.config_validation as cv # type: ignore
 
-from .const import (
-    DOMAIN,
-    CONF_STATION,
-    CONF_LOCATION,
-    CONF_SKIN_TYPE,
-    DEFAULT_NAME,
-)
+from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
 PLATFORMS = [Platform.SENSOR]
-
-CONFIG_SCHEMA = vol.Schema({
-    DOMAIN: vol.Schema({
-        vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
-        vol.Optional(CONF_STATION): cv.string,
-        vol.Optional(CONF_LOCATION): cv.string,
-        vol.Optional(CONF_SKIN_TYPE): cv.string,
-    }),
-}, extra=vol.ALLOW_EXTRA)
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up SSM from a config entry."""
