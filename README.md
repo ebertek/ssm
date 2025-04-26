@@ -1,16 +1,11 @@
 # Swedish Radiation Safety Authority (SSM) - Home Assistant Integration
-
 This custom integration allows you to monitor **radiation levels**, **UV index**, and **safe sun exposure time** based on data provided by the [Swedish Radiation Safety Authority (Strålsäkerhetsmyndigheten - SSM)](https://www.stralsakerhetsmyndigheten.se/).
 Stay informed about radiation risks and UV exposure based on your location and skin type, with live measurements and recommendations.
-
----
 
 ## ✨ Features
 - ☢️ Real-time **radiation level** monitoring from SSM stations.
 - 🌞 Live **UV index** data for multiple Swedish regions.
 - 🕒 **Maxiumum safe sun exposure time** calculation based on skin type and UV conditions.
-
----
 
 ## 📦 Installation
 ### HACS (Recommended)
@@ -32,8 +27,6 @@ Stay informed about radiation risks and UV exposure based on your location and s
 ### Manual Installation
 1. Copy the `custom_components/ssm` folder into your own `config/custom_components/`.
 2. Restart Home Assistant.
-
----
 
 ## ⚙️ Configuration
 1. Navigate to **Settings > Devices & services**.
@@ -74,12 +67,8 @@ Stay informed about radiation risks and UV exposure based on your location and s
 |          23 | Ölands Norra Udde       |  SE0055  |
 |          13 | Ölands Södra Udde       |  SE0056  |
 
----
-
 ## 📜 License
 This project is licensed under the [Apache License 2.0](LICENSE).
-
----
 
 ## 🤝 Credits
 Data provided by: [Swedish Radiation Safety Authority (SSM)](https://www.stralsakerhetsmyndigheten.se/).
