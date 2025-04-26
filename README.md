@@ -4,23 +4,29 @@ This is a custom component for Home Assistant that integrates with the **Swedish
 
 ## Installation
 ### HACS (Recommended)
-1. Go to **HACS**
-2. Click on the three-dot menu (top right) and select **Custom repositories**
-3. Add this Repository: `https://github.com/ebertek/ssm`
-4. Select **Integration** as the Type
-5. Search for `ssm`, select **Swedish Radiation Safety Authority**, click **Download**, and click **Download** again
-6. Restart Home Assistant
+1. Go to **HACS**.
+2. Click on the three-dot menu (top right) and select **Custom repositories**.
+    1. Set **Repository** to:
+
+        ```
+        https://github.com/ebertek/ssm
+        ```
+
+    2. Set **Type** to **Integration**.
+    3. Click **ADD**.
+3. Search for `ssm`, select **Swedish Radiation Safety Authority**, click **Download**, and click **Download** again.
+4. Restart Home Assistant.
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=ebertek&repository=ssm&category=Integration)
 
-### Manual Installation  
-1. Copy the `custom_components/ssm` folder into your own `config/custom_components/`
-2. Restart Home Assistant
+### Manual Installation
+1. Copy the `custom_components/ssm` folder into your own `config/custom_components/`.
+2. Restart Home Assistant.
 
 ## Configuration
-1. Navigate to **Settings > Devices & services**
-2. Click **Add integration** and search for `Swedish Radiation Safety Authority`
-3. Select your **Station for Radiation Data**, enter your **Location Name for UV Index**, and enter your **Skin Type**
+1. Navigate to **Settings > Devices & services**.
+2. Click **Add integration** and search for `Swedish Radiation Safety Authority`.
+3. Select your **Station for Radiation Data**, your **Location Name for UV Index**, and your **Skin Type**.
     1. To find your closest gamma radiation station, navigate to [SSM's radiation level site](https://karttjanst.ssm.se/gammastationer) or [REMon's radiological map](https://remap.jrc.ec.europa.eu/Advanced.aspx). You can find a mapping of location IDs, station names, and REMon IDs in the table below.
     2. To find your **Location Name for UV Index**, navigate to [SSM's UV-index site](https://www.stralsakerhetsmyndigheten.se/omraden/sol-och-solarier/uv-index/) and look under **Plats**.
     3. To find your **Skin Type**, please refer to **Solkänslighet** on [SSM's Min soltid site](https://www.minsoltid.se/).
