@@ -5,26 +5,30 @@
 import logging
 from typing import Any, Dict
 
-import voluptuous as vol # type: ignore
+import voluptuous as vol  # type: ignore
 
-from homeassistant import config_entries # type: ignore
-from homeassistant.core import HomeAssistant, callback # type: ignore
-from homeassistant.const import CONF_NAME # type: ignore
-from homeassistant.helpers.aiohttp_client import async_get_clientsession # type: ignore
-from homeassistant.helpers.selector import SelectSelector, SelectSelectorConfig # type: ignore
+from homeassistant import config_entries  # type: ignore
+from homeassistant.const import CONF_NAME  # type: ignore
+from homeassistant.core import HomeAssistant, callback  # type: ignore
+from homeassistant.helpers.aiohttp_client import async_get_clientsession  # type: ignore
+from homeassistant.helpers.selector import (  # type: ignore
+    SelectSelector,
+    SelectSelectorConfig,
+)
 
 from .const import (
-    DOMAIN,
-    CONF_STATION,
     CONF_LOCATION,
     CONF_SKIN_TYPE,
+    CONF_STATION,
     DEFAULT_NAME,
-    STATIONS,
+    DOMAIN,
     LOCATIONS,
-    SKIN_TYPES
+    SKIN_TYPES,
+    STATIONS,
 )
 
 _LOGGER = logging.getLogger(__name__)
+
 
 async def validate_input(hass: HomeAssistant, data: Dict[str, Any]) -> Dict[str, Any]:
     """Validate the user input allows us to connect."""
@@ -56,6 +60,7 @@ async def validate_input(hass: HomeAssistant, data: Dict[str, Any]) -> Dict[str,
     # Return validated data
     return {"title": data[CONF_NAME]}
 
+
 class SSMConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for SSM integration."""
 
@@ -72,7 +77,9 @@ class SSMConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 info = await validate_input(self.hass, user_input)
 
                 # Create a unique ID from name + location ID and location
-                await self.async_set_unique_id(f"{user_input[CONF_NAME]}_{user_input.get(CONF_STATION)}_{user_input.get(CONF_LOCATION)}")
+                await self.async_set_unique_id(
+                    f"{user_input[CONF_NAME]}_{user_input.get(CONF_STATION)}_{user_input.get(CONF_LOCATION)}"
+                )
                 self._abort_if_unique_id_configured()
 
                 return self.async_create_entry(
@@ -85,8 +92,7 @@ class SSMConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         # Create dropdown options for location ID
         station_options = [
-            {"value": station["id"], "label": station["name"]}
-            for station in STATIONS
+            {"value": station["id"], "label": station["name"]} for station in STATIONS
         ]
 
         # Create dropdown options for UV locations
@@ -159,8 +165,7 @@ class SSMOptionsFlow(config_entries.OptionsFlow):
 
         # Create dropdown options for location ID
         station_options = [
-            {"value": station["id"], "label": station["name"]}
-            for station in STATIONS
+            {"value": station["id"], "label": station["name"]} for station in STATIONS
         ]
 
         # Create dropdown options for UV locations
@@ -176,9 +181,15 @@ class SSMOptionsFlow(config_entries.OptionsFlow):
         ]
 
         # Get current values from config or options
-        station = self.config_entry.options.get(CONF_STATION, self.config_entry.data.get(CONF_STATION, ""))
-        location = self.config_entry.options.get(CONF_LOCATION, self.config_entry.data.get(CONF_LOCATION, ""))
-        skin_type = self.config_entry.options.get(CONF_SKIN_TYPE, self.config_entry.data.get(CONF_SKIN_TYPE, ""))
+        station = self.config_entry.options.get(
+            CONF_STATION, self.config_entry.data.get(CONF_STATION, "")
+        )
+        location = self.config_entry.options.get(
+            CONF_LOCATION, self.config_entry.data.get(CONF_LOCATION, "")
+        )
+        skin_type = self.config_entry.options.get(
+            CONF_SKIN_TYPE, self.config_entry.data.get(CONF_SKIN_TYPE, "")
+        )
 
         return self.async_show_form(
             step_id="init",

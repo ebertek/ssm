@@ -3,31 +3,41 @@
 # pylint: disable=C0301, E0401, R0902, R0903, R0912, R0913, R0914, R0915, R0917, W0511, W0718
 
 import asyncio
-from datetime import datetime, timedelta
 import logging
 import time
+from datetime import datetime, timedelta
 from urllib.parse import quote
 from zoneinfo import ZoneInfo
 
-from homeassistant.components.sensor import SensorEntity, SensorStateClass # type: ignore
-from homeassistant.const import CONF_NAME # type: ignore
-from homeassistant.helpers.aiohttp_client import async_get_clientsession # type: ignore
-from homeassistant.helpers.entity import DeviceInfo # type: ignore
-from homeassistant.util import dt as dt_util # type: ignore
+from homeassistant.components.sensor import (  # type: ignore
+    SensorEntity,
+    SensorStateClass,
+)
+from homeassistant.const import CONF_NAME  # type: ignore
+from homeassistant.helpers.aiohttp_client import async_get_clientsession  # type: ignore
+from homeassistant.helpers.entity import DeviceInfo  # type: ignore
+from homeassistant.util import dt as dt_util  # type: ignore
 
-from .const import DOMAIN, CONF_STATION, CONF_LOCATION, CONF_SKIN_TYPE, LOCATIONS
+from .const import CONF_LOCATION, CONF_SKIN_TYPE, CONF_STATION, DOMAIN, LOCATIONS
 
 _LOGGER = logging.getLogger(__name__)
 
 SCAN_INTERVAL = timedelta(minutes=30)
 
+
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up SSM sensors based on a config entry."""
     # Get combined data from the hass.data[DOMAIN] dictionary
     name = config_entry.options.get(CONF_NAME, config_entry.data.get(CONF_NAME))
-    station = config_entry.options.get(CONF_STATION, config_entry.data.get(CONF_STATION))
-    location = config_entry.options.get(CONF_LOCATION, config_entry.data.get(CONF_LOCATION))
-    skin_type = config_entry.options.get(CONF_SKIN_TYPE, config_entry.data.get(CONF_SKIN_TYPE))
+    station = config_entry.options.get(
+        CONF_STATION, config_entry.data.get(CONF_STATION)
+    )
+    location = config_entry.options.get(
+        CONF_LOCATION, config_entry.data.get(CONF_LOCATION)
+    )
+    skin_type = config_entry.options.get(
+        CONF_SKIN_TYPE, config_entry.data.get(CONF_SKIN_TYPE)
+    )
 
     # Create session
     session = async_get_clientsession(hass)
@@ -36,20 +46,33 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     entities = []
 
     if station:
-        radiation_sensor = SSMRadiationSensor(hass, session, name, station, config_entry.entry_id)
+        radiation_sensor = SSMRadiationSensor(
+            hass, session, name, station, config_entry.entry_id
+        )
         entities.append(radiation_sensor)
 
     if location:
-        uv_sensor = SSMUVIndexSensor(hass, session, name, location, config_entry.entry_id)
+        uv_sensor = SSMUVIndexSensor(
+            hass, session, name, location, config_entry.entry_id
+        )
         entities.append(uv_sensor)
 
         # Only add sun time sensor if both location and skin_type are available
         if skin_type:
-            sun_time_sensor = SSMSunTimeSensor(hass, session, name, skin_type, uv_sensor, location, config_entry.entry_id)
+            sun_time_sensor = SSMSunTimeSensor(
+                hass,
+                session,
+                name,
+                skin_type,
+                uv_sensor,
+                location,
+                config_entry.entry_id,
+            )
             entities.append(sun_time_sensor)
 
     if entities:
         async_add_entities(entities, True)
+
 
 class SSMRadiationSensor(SensorEntity):
     """Representation of a SSM Radiation Sensor."""
@@ -111,21 +134,34 @@ class SSMRadiationSensor(SensorEntity):
 
                     if "values" in data and data["values"]:
                         values = data["values"]
-                        radiation_values = [item[1] for item in values]  # Extract radiation values
+                        radiation_values = [
+                            item[1] for item in values
+                        ]  # Extract radiation values
 
                         # Convert from μSv/h to nSv/h
-                        self._attr_native_value = round(radiation_values[-1] * 1000)  # Most recent value
-                        self._attr_extra_state_attributes["last_updated"] = dt_util.utcnow().isoformat()
+                        self._attr_native_value = round(
+                            radiation_values[-1] * 1000
+                        )  # Most recent value
+                        self._attr_extra_state_attributes["last_updated"] = (
+                            dt_util.utcnow().isoformat()
+                        )
                         self._attr_available = True
                     else:
-                        _LOGGER.error("Invalid data format received from SSM Radiation API: %s", data)
+                        _LOGGER.error(
+                            "Invalid data format received from SSM Radiation API: %s",
+                            data,
+                        )
                         self._attr_available = False
                 else:
-                    _LOGGER.error("Failed to fetch radiation data from SSM API: %s", response.status)
+                    _LOGGER.error(
+                        "Failed to fetch radiation data from SSM API: %s",
+                        response.status,
+                    )
                     self._attr_available = False
         except Exception as e:
             _LOGGER.error("Error updating SSM Radiation sensor: %s", e)
             self._attr_available = False
+
 
 class SSMUVIndexSensor(SensorEntity):
     """Representation of a SSM UV Index Sensor."""
@@ -218,7 +254,11 @@ class SSMUVIndexSensor(SensorEntity):
                     data = await response.json()
                     _LOGGER.debug("Received response from UV Index API: %s", data)
 
-                    if "response" in data and "location" in data["response"] and "date" in data["response"]["location"]:
+                    if (
+                        "response" in data
+                        and "location" in data["response"]
+                        and "date" in data["response"]["location"]
+                    ):
                         location_data = data["response"]["location"]
                         today_data = location_data["date"][0]
 
@@ -232,7 +272,9 @@ class SSMUVIndexSensor(SensorEntity):
                         max_uv_time = today_data["maxUvIndexTime"]
 
                         # Format time to HH:MM
-                        max_time_obj = datetime.strptime(max_uv_time, "%Y-%m-%dT%H:%M:%S")
+                        max_time_obj = datetime.strptime(
+                            max_uv_time, "%Y-%m-%dT%H:%M:%S"
+                        )
                         max_time_formatted = max_time_obj.strftime("%H:%M")
 
                         # Get tomorrow's data if available
@@ -250,26 +292,41 @@ class SSMUVIndexSensor(SensorEntity):
                         self._attr_native_value = current_uv
                         self._attr_extra_state_attributes["current_uv"] = current_uv
                         self._attr_extra_state_attributes["max_uv_today"] = max_uv_today
-                        self._attr_extra_state_attributes["max_uv_time"] = max_time_formatted
-                        self._attr_extra_state_attributes["max_uv_tomorrow"] = max_uv_tomorrow
-                        self._attr_extra_state_attributes["hourly_forecast"] = hourly_forecast
+                        self._attr_extra_state_attributes["max_uv_time"] = (
+                            max_time_formatted
+                        )
+                        self._attr_extra_state_attributes["max_uv_tomorrow"] = (
+                            max_uv_tomorrow
+                        )
+                        self._attr_extra_state_attributes["hourly_forecast"] = (
+                            hourly_forecast
+                        )
                         risk_level_key = self._get_risk_level(max_uv_today)
                         self._attr_extra_state_attributes["risk_level"] = risk_level_key
-                        self._attr_extra_state_attributes["last_updated"] = dt_util.utcnow().isoformat()
+                        self._attr_extra_state_attributes["last_updated"] = (
+                            dt_util.utcnow().isoformat()
+                        )
 
                         # Update icon based on current UV value
                         self._attr_icon = self._get_icon(current_uv)
 
                         self._attr_available = True
                     else:
-                        _LOGGER.error("Invalid data format received from SSM UV Index API: %s", data)
+                        _LOGGER.error(
+                            "Invalid data format received from SSM UV Index API: %s",
+                            data,
+                        )
                         self._attr_available = False
                 else:
-                    _LOGGER.error("Failed to fetch UV index data from SSM API: %s", response.status)
+                    _LOGGER.error(
+                        "Failed to fetch UV index data from SSM API: %s", 
+                        response.status,
+                    )
                     self._attr_available = False
         except Exception as e:
             _LOGGER.error("Error updating SSM UV Index sensor: %s", e)
             self._attr_available = False
+
 
 class SSMSunTimeSensor(SensorEntity):
     """Representation of a SSM Min Soltid Sensor."""
@@ -320,17 +377,38 @@ class SSMSunTimeSensor(SensorEntity):
         """Fetch the current UV index from the UV sensor, with retries."""
         for attempt in range(1, retries + 1):
             try:
-                if not hasattr(self._uv_sensor, 'entity_id') or not self._uv_sensor.entity_id:
-                    _LOGGER.debug("UV sensor not ready (attempt %d/%d), retrying in %ds...", attempt, retries, delay)
+                if (
+                    not hasattr(self._uv_sensor, 'entity_id')
+                    or not self._uv_sensor.entity_id
+                ):
+                    _LOGGER.debug(
+                        "UV sensor not ready (attempt %d/%d), retrying in %ds...",
+                        attempt,
+                        retries,
+                        delay,
+                    )
                 else:
                     uv_state = self.hass.states.get(self._uv_sensor.entity_id)
-                    if uv_state and uv_state.state not in (None, "unknown", "unavailable"):
+                    if uv_state and uv_state.state not in (
+                        None,
+                        "unknown",
+                        "unavailable",
+                    ):
                         uv_index = uv_state.attributes.get("current_uv")
                         if uv_index is not None:
-                            _LOGGER.debug("UV index successfully retrieved: %s (attempt %d)", uv_index, attempt)
+                            _LOGGER.debug(
+                                "UV index successfully retrieved: %s (attempt %d)",
+                                uv_index,
+                                attempt,
+                            )
                             return int(round(float(uv_index)))
                     else:
-                        _LOGGER.debug("UV sensor state unavailable (attempt %d/%d), retrying in %ds...", attempt, retries, delay)
+                        _LOGGER.debug(
+                            "UV sensor state unavailable (attempt %d/%d), retrying in %ds...",
+                            attempt,
+                            retries,
+                            delay,
+                        )
             except Exception as e:
                 _LOGGER.warning("Error retrieving UV index on attempt %d: %s", attempt, e)
 
@@ -342,7 +420,11 @@ class SSMSunTimeSensor(SensorEntity):
         return None
 
     def _parse_safe_times(self, results):
-        safe_times = {"direkt solljus": None, "lite skugga": None, "mycket skugga": None}
+        safe_times = {
+            "direkt solljus": None,
+            "lite skugga": None,
+            "mycket skugga": None,
+        }
         for item in results:
             desc = item.get("shadowDescription", "").lower()
             for key in safe_times:
@@ -376,18 +458,33 @@ class SSMSunTimeSensor(SensorEntity):
             async with self._session.post(url, json=payload) as response:
                 if response.status == 200:
                     data = await response.json()
-                    _LOGGER.debug("Received response from Sun Time API (/calculate): %s", data)
+                    _LOGGER.debug(
+                        "Received response from Sun Time API (/calculate): %s", data
+                    )
 
-                    safe_times = self._parse_safe_times(data.get("result", {}).get("safeTimeResults", []))
+                    safe_times = self._parse_safe_times(
+                        data.get("result", {}).get("safeTimeResults", [])
+                    )
 
                     self._attr_native_value = safe_times.get("direkt solljus")
-                    self._attr_extra_state_attributes["shade_direct_sun"] = safe_times.get("direkt solljus")
-                    self._attr_extra_state_attributes["shade_partial"] = safe_times.get("lite skugga")
-                    self._attr_extra_state_attributes["shade_full"] = safe_times.get("mycket skugga")
-                    self._attr_extra_state_attributes["last_updated"] = dt_util.utcnow().isoformat()
+                    self._attr_extra_state_attributes["shade_direct_sun"] = (
+                        safe_times.get("direkt solljus")
+                    )
+                    self._attr_extra_state_attributes["shade_partial"] = (
+                        safe_times.get("lite skugga")
+                    )
+                    self._attr_extra_state_attributes["shade_full"] = (
+                        safe_times.get("mycket skugga")
+                    )
+                    self._attr_extra_state_attributes["last_updated"] = (
+                        dt_util.utcnow().isoformat()
+                    )
                     self._attr_available = True
                 else:
-                    _LOGGER.error("Failed to fetch Sun Time API (/calculate) response: %s", response.status)
+                    _LOGGER.error(
+                        "Failed to fetch Sun Time API (/calculate) response: %s",
+                        response.status,
+                    )
                     self._attr_native_value = None
                     self._attr_available = False
                     return
@@ -399,7 +496,9 @@ class SSMSunTimeSensor(SensorEntity):
         # Enrich with /calculatewithindex if UV index is available
         uv_index = await self._get_uv_index()
         if uv_index is None:
-            _LOGGER.debug("Skipping Sun Time API (/calculatewithindex) due to unavailable UV index.")
+            _LOGGER.debug(
+                "Skipping Sun Time API (/calculatewithindex) due to unavailable UV index."
+            )
             return
 
         payload = {
@@ -407,21 +506,39 @@ class SSMSunTimeSensor(SensorEntity):
             "uvIndex": str(uv_index),
         }
 
-        url = "https://www.stralsakerhetsmyndigheten.se/api/v1/suntime/calculatewithindex"
-        _LOGGER.debug("Sending request to Sun Time API (/calculatewithindex): %s", payload)
+        url = (
+            "https://www.stralsakerhetsmyndigheten.se/api/v1/suntime/calculatewithindex"
+        )
+        _LOGGER.debug(
+            "Sending request to Sun Time API (/calculatewithindex): %s", payload
+        )
 
         try:
             async with self._session.post(url, json=payload) as response:
                 if response.status == 200:
                     data = await response.json()
-                    _LOGGER.debug("Received response from Sun Time API (/calculatewithindex): %s", data)
+                    _LOGGER.debug(
+                        "Received response from Sun Time API (/calculatewithindex): %s", 
+                        data,
+                    )
 
-                    safe_times = self._parse_safe_times(data.get("result", {}).get("safeTimeResults", []))
+                    safe_times = self._parse_safe_times(
+                        data.get("result", {}).get("safeTimeResults", [])
+                    )
 
-                    self._attr_extra_state_attributes["i_shade_direct_sun"] = safe_times.get("direkt solljus")
-                    self._attr_extra_state_attributes["i_shade_partial"] = safe_times.get("lite skugga")
-                    self._attr_extra_state_attributes["i_shade_full"] = safe_times.get("mycket skugga")
+                    self._attr_extra_state_attributes["i_shade_direct_sun"] = (
+                        safe_times.get("direkt solljus")
+                    )
+                    self._attr_extra_state_attributes["i_shade_partial"] = (
+                        safe_times.get("lite skugga")
+                    )
+                    self._attr_extra_state_attributes["i_shade_full"] = (
+                        safe_times.get("mycket skugga")
+                    )
                 else:
-                    _LOGGER.warning("Failed to fetch Sun Time API (/calculatewithindex) response: %s", response.status)
+                    _LOGGER.warning(
+                        "Failed to fetch Sun Time API (/calculatewithindex) response: %s",
+                        response.status,
+                    )
         except Exception as e:
             _LOGGER.warning("Error calling Sun Time API (/calculatewithindex): %s", e)
