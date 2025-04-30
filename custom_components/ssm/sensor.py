@@ -319,7 +319,7 @@ class SSMUVIndexSensor(SensorEntity):
                         self._attr_available = False
                 else:
                     _LOGGER.error(
-                        "Failed to fetch UV index data from SSM API: %s", 
+                        "Failed to fetch UV index data from SSM API: %s",
                         response.status,
                     )
                     self._attr_available = False
@@ -378,7 +378,7 @@ class SSMSunTimeSensor(SensorEntity):
         for attempt in range(1, retries + 1):
             try:
                 if (
-                    not hasattr(self._uv_sensor, 'entity_id')
+                    not hasattr(self._uv_sensor, "entity_id")
                     or not self._uv_sensor.entity_id
                 ):
                     _LOGGER.debug(
@@ -410,7 +410,9 @@ class SSMSunTimeSensor(SensorEntity):
                             delay,
                         )
             except Exception as e:
-                _LOGGER.warning("Error retrieving UV index on attempt %d: %s", attempt, e)
+                _LOGGER.warning(
+                    "Error retrieving UV index on attempt %d: %s", attempt, e
+                )
 
             # Only wait if not on last attempt
             if attempt < retries:
@@ -518,7 +520,7 @@ class SSMSunTimeSensor(SensorEntity):
                 if response.status == 200:
                     data = await response.json()
                     _LOGGER.debug(
-                        "Received response from Sun Time API (/calculatewithindex): %s", 
+                        "Received response from Sun Time API (/calculatewithindex): %s",
                         data,
                     )
 

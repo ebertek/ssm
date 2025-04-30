@@ -48,7 +48,9 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             "Successfully unloaded SSM integration with entry_id: %s", entry.entry_id
         )
     else:
-        _LOGGER.warning("Failed to unload SSM integration with entry_id: %s", entry.entry_id)
+        _LOGGER.warning(
+            "Failed to unload SSM integration with entry_id: %s", entry.entry_id
+        )
 
     return unload_ok
 

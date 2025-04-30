@@ -6,7 +6,6 @@ import logging
 from typing import Any, Dict
 
 import voluptuous as vol  # type: ignore
-
 from homeassistant import config_entries  # type: ignore
 from homeassistant.const import CONF_NAME  # type: ignore
 from homeassistant.core import HomeAssistant, callback  # type: ignore
@@ -60,8 +59,8 @@ async def validate_input(hass: HomeAssistant, data: Dict[str, Any]) -> Dict[str,
     # Return validated data
     return {"title": data[CONF_NAME]}
 
-
-class SSMConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+@flow_handler(DOMAIN)
+class SSMConfigFlow(config_entries.ConfigFlow):
     """Handle a config flow for SSM integration."""
 
     VERSION = 1
