@@ -123,7 +123,7 @@ class SSMRadiationSensor(SensorEntity):
             start_timestamp = int(start.timestamp() * 1000)
             end_timestamp = int(end.timestamp() * 1000)
 
-            url = f"https://karttjanst.ssm.se/data/getHistoryForStation?locationId={self._station}&start={start_timestamp}&end={end_timestamp}"
+            url = f"https://karttjanst.ssm.se/data/getHistoryForStation?locationId={self._station}&start={start_timestamp}&end={end_timestamp}"  #pylint: disable=line-too-long
 
             _LOGGER.debug("Sending request to Radiation API: %s", url)
 
