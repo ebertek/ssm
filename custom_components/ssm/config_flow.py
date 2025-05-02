@@ -20,7 +20,6 @@ from .const import (
     CONF_SKIN_TYPE,
     CONF_STATION,
     DEFAULT_NAME,
-    DOMAIN,
     LOCATIONS,
     SKIN_TYPES,
     STATIONS,
