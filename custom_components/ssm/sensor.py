@@ -472,11 +472,11 @@ class SSMSunTimeSensor(SensorEntity):
                     self._attr_extra_state_attributes["shade_direct_sun"] = (
                         safe_times.get("direkt solljus")
                     )
-                    self._attr_extra_state_attributes["shade_partial"] = (
-                        safe_times.get("lite skugga")
+                    self._attr_extra_state_attributes["shade_partial"] = safe_times.get(
+                        "lite skugga"
                     )
-                    self._attr_extra_state_attributes["shade_full"] = (
-                        safe_times.get("mycket skugga")
+                    self._attr_extra_state_attributes["shade_full"] = safe_times.get(
+                        "mycket skugga"
                     )
                     self._attr_extra_state_attributes["last_updated"] = (
                         dt_util.utcnow().isoformat()
@@ -534,8 +534,8 @@ class SSMSunTimeSensor(SensorEntity):
                     self._attr_extra_state_attributes["i_shade_partial"] = (
                         safe_times.get("lite skugga")
                     )
-                    self._attr_extra_state_attributes["i_shade_full"] = (
-                        safe_times.get("mycket skugga")
+                    self._attr_extra_state_attributes["i_shade_full"] = safe_times.get(
+                        "mycket skugga"
                     )
                 else:
                     _LOGGER.warning(

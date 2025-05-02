@@ -59,7 +59,7 @@ async def validate_input(hass: HomeAssistant, data: Dict[str, Any]) -> Dict[str,
     # Return validated data
     return {"title": data[CONF_NAME]}
 
-@flow_handler(DOMAIN)
+
 class SSMConfigFlow(config_entries.ConfigFlow):
     """Handle a config flow for SSM integration."""
 
