@@ -20,6 +20,7 @@ from .const import (
     CONF_SKIN_TYPE,
     CONF_STATION,
     DEFAULT_NAME,
+    DOMAIN,
     LOCATIONS,
     SKIN_TYPES,
     STATIONS,
@@ -59,7 +60,7 @@ async def validate_input(hass: HomeAssistant, data: Dict[str, Any]) -> Dict[str,
     return {"title": data[CONF_NAME]}
 
 
-class SSMConfigFlow(config_entries.ConfigFlow):
+class SSMConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for SSM integration."""
 
     VERSION = 1
