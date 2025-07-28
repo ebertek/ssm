@@ -115,52 +115,68 @@ class SSMRadiationSensor(SensorEntity):
             now = datetime.now(stockholm)
             is_dst = bool(now.dst())
 
-            # Fetch the last two values
-            end = now.replace(minute=0, second=0, microsecond=0)
-            start = end - timedelta(hours=3 if is_dst else 2)
-
-            # Convert to Unix timestamps in milliseconds
-            start_timestamp = int(start.timestamp() * 1000)
-            end_timestamp = int(end.timestamp() * 1000)
-
-            url = (
-                "https://karttjanst.ssm.se/data/getHistoryForStation"
-                f"?locationId={self._station}&start={start_timestamp}&end={end_timestamp}"
-            )
-
-            _LOGGER.debug("Sending request to Radiation API: %s", url)
-
-            async with self._session.get(url) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    _LOGGER.debug("Received response from Radiation API: %s", data)
-
-                    if "values" in data and data["values"]:
-                        values = data["values"]
-                        radiation_values = [
-                            item[1] for item in values
-                        ]  # Extract radiation values
-
-                        # Convert from μSv/h to nSv/h
-                        self._attr_native_value = round(
-                            radiation_values[-1] * 1000
-                        )  # Most recent value
-                        self._attr_extra_state_attributes["last_updated"] = (
-                            dt_util.utcnow().isoformat()
-                        )
-                        self._attr_available = True
-                    else:
-                        _LOGGER.error(
-                            "Invalid data format received from SSM Radiation API: %s",
-                            data,
-                        )
-                        self._attr_available = False
+            def get_time_range(strategy: str):
+                end = now.replace(minute=0, second=0, microsecond=0)
+                if strategy == "normal":  # Fetch the last two values
+                    start = end - timedelta(hours=3 if is_dst else 2)
+                elif strategy == "fallback":  # Fetch one more hour
+                    start = end - timedelta(hours=4 if is_dst else 3)
+                elif strategy == "midnight":  # Fetch all values since midnight
+                    start = now.replace(hour=0, minute=0, second=0, microsecond=0)
                 else:
-                    _LOGGER.error(
-                        "Failed to fetch radiation data from SSM API: %s",
-                        response.status,
-                    )
-                    self._attr_available = False
+                    raise ValueError(f"Unknown strategy: {strategy}")
+                _LOGGER.debug(
+                    "Query window for Radiation API (%s): %s to %s",
+                    strategy,
+                    start,
+                    end,
+                )
+                return int(start.timestamp() * 1000), int(end.timestamp() * 1000)  # Convert to Unix timestamps in milliseconds
+
+            for strategy in ["normal", "fallback", "midnight"]:
+                start_timestamp, end_timestamp = get_time_range(strategy)
+                url = (
+                    "https://karttjanst.ssm.se/data/getHistoryForStation"
+                    f"?locationId={self._station}&start={start_timestamp}&end={end_timestamp}"
+                )
+
+                _LOGGER.debug("Sending request to Radiation API: %s", url)
+
+                async with self._session.get(url) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        _LOGGER.debug("Received response from Radiation API: %s", data)
+
+                        if "values" in data and data["values"]:
+                            values = data["values"]
+                            radiation_values = [
+                                item[1] for item in values
+                            ]  # Extract radiation values
+
+                            # Convert from μSv/h to nSv/h
+                            self._attr_native_value = round(
+                                radiation_values[-1] * 1000
+                            )  # Most recent value
+                            self._attr_extra_state_attributes["last_updated"] = (
+                                dt_util.utcnow().isoformat()
+                            )
+                            self._attr_available = True
+                            return  # Success — no need to try other strategies
+                        else:
+                            _LOGGER.debug(
+                                "Invalid data format received from SSM Radiation API: %s",
+                                data,
+                            )
+                    else:
+                        _LOGGER.debug(
+                            "Failed to fetch radiation data from SSM API: %s",
+                            response.status,
+                        )
+
+            # All strategies failed
+            _LOGGER.error("Failed to retrieve valid radiation data after all fallback attempts.")
+            self._attr_available = False
+
         except Exception as e:
             _LOGGER.error("Error updating SSM Radiation sensor: %s", e)
             self._attr_available = False
