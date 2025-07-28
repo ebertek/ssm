@@ -70,12 +70,27 @@
     },
     "location": {
       "options": {
+        "sverige-abisko": "Abisko",
         "sverige-gotland": "Gotland",
+        "sverige-gavle": "Gävle",
         "sverige-goteborg": "Göteborg",
+        "sverige-halmstad": "Halmstad",
+        "sverige-idre-fjall": "Idre Fjäll",
+        "sverige-jonkoping": "Jönköping",
+        "sverige-karlstad": "Karlstad",
+        "sverige-kebnekaise": "Kebnekaise",
         "sverige-malmo": "Malmö",
-        "sverige-stockholm": "Stockholm",
+        "sverige-mora": "Mora",
         "sverige-polcirkeln": "Északi sarkkör",
+        "sverige-riksgransen": "Riksgränsen",
+        "sverige-stockholm": "Stockholm",
+        "sverige-sundsvall": "Sundsvall",
+        "sverige-salen": "Sälen",
+        "sverige-tanndalen": "Tänndalen",
+        "sverige-umea": "Umeå",
+        "sverige-vemdalen": "Vemdalen",
         "sverige-oland": "Öland",
+        "sverige-orebro": "Örebro",
         "sverige-ostersund": "Östersund"
       }
     },
