@@ -81,12 +81,12 @@
     },
     "skin_type": {
       "options": {
-        "1": "Type 1 (Very fair, burns easily)",
-        "2": "Type 2 (Fair, burns easily)",
-        "3": "Type 3 (Medium, sometimes burns)",
-        "4": "Type 4 (Olive, rarely burns)",
-        "5": "Type 5 (Brown, very rarely burns)",
-        "6": "Type 6 (Dark brown, never burns)"
+        "1": "Type 1: Always burns, never tans (palest; freckles); very light or white, \"Celtic\" type.",
+        "2": "Type 2: Usually burns, tans minimally (light colored but darker than pale); light or light-skinned European.",
+        "3": "Type 3: Sometimes mild burn, tans uniformly (golden honey or olive); light intermediate, or dark-skinned European.",
+        "4": "Type 4: Burns minimally, always tans well (moderate brown); dark intermediate or \"olive skin\".",
+        "5": "Type 5: Very rarely burns, tans very easily (dark brown); dark or \"brown\" type.",
+        "6": "Type 6: Never burns (deeply pigmented dark brown to darkest brown); very dark or \"black\" type."
       }
     }
   },

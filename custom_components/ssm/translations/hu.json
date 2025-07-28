@@ -81,12 +81,12 @@
     },
     "skin_type": {
       "options": {
-        "1": "Type 1 (Nagyon világos, sápadt fehér)",
-        "2": "Type 2 (Világos, fehér)",
-        "3": "Type 3 (Világosbarna)",
-        "4": "Type 4 (Közepesen barna)",
-        "5": "Type 5 (Sötétbarna)",
-        "6": "Type 6 (Erősen pigmentált sötétbarna-fekete)"
+        "1": "1-es típus: Mindig leég, sosem barnul (nagyon világos, szeplős); \"kelta\" típus.",
+        "2": "2-es típus: Általában leég, csak minimálisan barnul (világos bőrű európai).",
+        "3": "3-as típus: Néha enyhén leég, egyenletesen barnul (aranybarna vagy olívás); közepesen világos vagy sötétebb európai.",
+        "4": "4-es típus: Csak minimálisan ég le, mindig jól barnul (középbarnás, olívás bőr).",
+        "5": "5-ös típus: Nagyon ritkán ég le, könnyen barnul (sötétbarna bőr); \"barna\" típus.",
+        "6": "6-os típus: Soha nem ég le (mélyen pigmentált sötétbarna vagy fekete bőr); \"fekete\" típus."
       }
     }
   },

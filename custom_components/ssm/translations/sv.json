@@ -81,12 +81,12 @@
     },
     "skin_type": {
       "options": {
-        "1": "Typ 1 (Alltid röd - aldrig brun)",
-        "2": "Typ 2 (Alltid röd - ibland brun)",
-        "3": "Typ 3 (Ibland röd - alltid brun)",
-        "4": "Typ 4 (Sällan röd - alltid brun)",
-        "5": "Typ 5 (Mycket sällan röd - alltid brun)",
-        "6": "Typ 6 (Aldrig röd - alltid brun)"
+        "1": "Typ 1: Alltid röd - aldrig brun. Oftast rödhåriga och blonda personer med blå eller gröna ögon och ljus hy. Personer med många hudfläckar.",
+        "2": "Typ 2: Alltid röd - ibland brun. Oftast mörkblonda personer med blå ögon och ljus hy.",
+        "3": "Typ 3: Ibland röd - alltid brun. Oftast mörkhåriga personer med ljus till ljusbrun hy.",
+        "4": "Typ 4: Sällan röd - alltid brun. Oftast mörkhåriga personer med naturligt ljusbrun hy.",
+        "5": "Typ 5: Mycket sällan röd - alltid brun. Oftast mörkhåriga personer med naturligt mörkbrun hy.",
+        "6": "Typ 6: Aldrig röd - alltid brun. Oftast mörkhåriga personer med nästan helt svart hy."
       }
     }
   },
