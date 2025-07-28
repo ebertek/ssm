@@ -131,7 +131,9 @@ class SSMRadiationSensor(SensorEntity):
                     start,
                     end,
                 )
-                return int(start.timestamp() * 1000), int(end.timestamp() * 1000)  # Convert to Unix timestamps in milliseconds
+                return int(start.timestamp() * 1000), int(
+                    end.timestamp() * 1000
+                )  # Convert to Unix timestamps in milliseconds
 
             for strategy in ["normal", "fallback", "midnight"]:
                 start_timestamp, end_timestamp = get_time_range(strategy)
@@ -162,11 +164,11 @@ class SSMRadiationSensor(SensorEntity):
                             )
                             self._attr_available = True
                             return  # Success — no need to try other strategies
-                        else:
-                            _LOGGER.debug(
-                                "Invalid data format received from SSM Radiation API: %s",
-                                data,
-                            )
+
+                        _LOGGER.debug(
+                            "Invalid data format received from SSM Radiation API: %s",
+                            data,
+                        )
                     else:
                         _LOGGER.debug(
                             "Failed to fetch radiation data from SSM API: %s",
@@ -174,7 +176,9 @@ class SSMRadiationSensor(SensorEntity):
                         )
 
             # All strategies failed
-            _LOGGER.error("Failed to retrieve valid radiation data after all fallback attempts.")
+            _LOGGER.error(
+                "Failed to retrieve valid radiation data after all fallback attempts."
+            )
             self._attr_available = False
 
         except Exception as e:
