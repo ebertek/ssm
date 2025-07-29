@@ -15,7 +15,6 @@ Stay informed about radiation risks and UV exposure based on your location and s
 
 1. Go to **HACS**.
 2. Click on the three-dot menu (top right) and select **Custom repositories**.
-
    1. Set **Repository** to:
 
       ```text
