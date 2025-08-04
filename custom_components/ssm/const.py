@@ -113,7 +113,7 @@ LOCATIONS = [
     {
         "id": "sverige-polcirkeln",
         "name": "Polcirkeln",
-        "api_name": "Sverige (polcirkeln)",
+        "api_name": "Sverige (Polcirkeln)",
         "latitude": "66.54772",
     },
     {
