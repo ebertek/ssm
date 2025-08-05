@@ -3,8 +3,8 @@
 # pylint: disable=C0301, E0401, R0903, W0718, W0719
 
 import logging
-from typing import Any, Dict
 import uuid
+from typing import Any, Dict
 
 import voluptuous as vol  # type: ignore
 from homeassistant import config_entries  # type: ignore
