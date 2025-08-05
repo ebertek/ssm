@@ -4,6 +4,7 @@
 
 import logging
 from typing import Any, Dict
+import uuid
 
 import voluptuous as vol  # type: ignore
 from homeassistant import config_entries  # type: ignore
@@ -75,10 +76,9 @@ class SSMConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
             try:
                 info = await validate_input(self.hass, user_input)
 
-                # Create a unique ID from name + location ID and location
-                await self.async_set_unique_id(
-                    f"{user_input[CONF_NAME]}_{user_input.get(CONF_STATION)}_{user_input.get(CONF_LOCATION)}"
-                )
+                # Generate a UUID-based unique ID
+                unique_id = str(uuid.uuid4())
+                await self.async_set_unique_id(unique_id)
                 self._abort_if_unique_id_configured()
 
                 return self.async_create_entry(
@@ -86,8 +86,8 @@ class SSMConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
                     data=user_input,
                 )
             except Exception:
-                _LOGGER.debug("Failed user input: %s", user_input)
-                errors["base"] = "cannot_connect"
+                _LOGGER.debug("Failed user input: %s", user_input, exc_info=True)
+                errors["base"] = "unknown"
 
         # Create dropdown options for location ID
         station_options = [
