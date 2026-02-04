@@ -37,3 +37,4 @@ jobs:
           VALIDATE_JSCPD: false
           VALIDATE_NATURAL_LANGUAGE: false
           VALIDATE_PYTHON_RUFF_FORMAT: false
+          VALIDATE_SPELL_CODESPELL: false
