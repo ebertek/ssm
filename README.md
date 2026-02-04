@@ -7,7 +7,7 @@ Stay informed about radiation risks and UV exposure based on your location and s
 
 - ☢️ Real-time **radiation level** monitoring from SSM stations.
 - 🌞 Live **UV index** data for multiple Swedish regions.
-- 🕒 **Maxiumum safe sun exposure time** calculation based on skin type and UV conditions.
+- 🕒 **Maximum safe sun exposure time** calculation based on skin type and UV conditions.
 
 ## 📦 Installation
 
