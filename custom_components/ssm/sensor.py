@@ -267,10 +267,10 @@ class SSMRadiationSensor(SensorEntity):
                     continue
 
                 # API values are μSv/h. Sensor exposes nSv/h.
-                latest_value = valid_values[-1]
-                min_value = min(valid_values)
-                max_value = max(valid_values)
-                avg_value = sum(valid_values) / len(valid_values)
+                latest_value: float = valid_values[-1]
+                min_value: float = min(valid_values)
+                max_value: float = max(valid_values)
+                avg_value: float = sum(valid_values) / len(valid_values)
 
                 self._attr_native_value = round(latest_value * 1000)
                 self._attr_extra_state_attributes["min_level"] = round(min_value * 1000)
@@ -419,8 +419,8 @@ class SSMUVIndexSensor(SensorEntity):
                 self._attr_available = False
                 return
 
-            current_uv = _to_number(hourly_data[current_hour])
-            max_uv_today = _to_number(today_data["maxUvIndex"])
+            current_uv: int | float | None = _to_number(hourly_data[current_hour])
+            max_uv_today: int | float | None = _to_number(today_data["maxUvIndex"])
 
             if current_uv is None or max_uv_today is None:
                 _LOGGER.error(
@@ -606,9 +606,9 @@ class SSMSunTimeSensor(SensorEntity):
                 data.get("result", {}).get("safeTimeResults", [])
             )
 
-            direct_sun = safe_times.get("direkt solljus")
-            partial_shade = safe_times.get("lite skugga")
-            full_shade = safe_times.get("mycket skugga")
+            direct_sun: int | float | None = safe_times.get("direkt solljus")
+            partial_shade: int | float | None = safe_times.get("lite skugga")
+            full_shade: int | float | None = safe_times.get("mycket skugga")
 
             if direct_sun is None:
                 _LOGGER.warning(
@@ -698,9 +698,9 @@ class SSMSunTimeSensor(SensorEntity):
                 data.get("result", {}).get("safeTimeResults", [])
             )
 
-            index_direct_sun = safe_times.get("direkt solljus")
-            index_partial_shade = safe_times.get("lite skugga")
-            index_full_shade = safe_times.get("mycket skugga")
+            index_direct_sun: int | float | None = safe_times.get("direkt solljus")
+            index_partial_shade: int | float | None = safe_times.get("lite skugga")
+            index_full_shade: int | float | None = safe_times.get("mycket skugga")
 
             if index_direct_sun is None:
                 _LOGGER.warning(
