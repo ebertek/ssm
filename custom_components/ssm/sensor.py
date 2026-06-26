@@ -279,13 +279,13 @@ class SSMRadiationSensor(SensorEntity):
                 self._attr_available = True
                 return
 
-            _LOGGER.error(
+            _LOGGER.warning(
                 "Failed to retrieve valid radiation data after all fallback attempts."
             )
             self._attr_available = False
 
         except (ClientError, TimeoutError, ValueError, KeyError, TypeError) as error:
-            _LOGGER.error("Error updating SSM Radiation sensor: %s", error)
+            _LOGGER.warning("Error updating SSM Radiation sensor: %s", error)
             self._attr_available = False
         except Exception as error:
             _LOGGER.exception("Unexpected error updating SSM Radiation sensor: %s", error)
@@ -503,10 +503,14 @@ class SSMSunTimeSensor(SensorEntity):
         }
 
     @staticmethod
-    def _get_location_latitude(location_id: str) -> float | None:
-        """Get the latitude for a given location ID."""
+    def _get_location_coordinates(location_id: str) -> tuple[float | None, float | None]:
+        """Get latitude and longitude for a given location ID."""
         location = next((loc for loc in LOCATIONS if loc["id"] == location_id), None)
-        return location["latitude"] if location else None
+
+        if location is None:
+            return None, None
+
+        return location["latitude"], location["longitude"]
 
     def _get_uv_index(self) -> int | None:
         """Return the current UV index from the UV sensor."""
@@ -538,19 +542,20 @@ class SSMSunTimeSensor(SensorEntity):
 
     async def async_update(self) -> None:
         """Get the latest data from the API and update the state."""
-        latitude = self._get_location_latitude(self._location)
-        if latitude is None:
-            _LOGGER.error("Latitude not found for location: %s", self._location)
+        latitude, longitude = self._get_location_coordinates(self._location)
+        if latitude is None or longitude is None:
+            _LOGGER.error("Coordinates not found for location: %s", self._location)
             self._attr_available = False
             return
 
         now = datetime.now(STOCKHOLM_TIMEZONE)
 
         payload = {
-            "skintypeId": str(self._skin_type),
+            "skintypeId": int(self._skin_type),
             "latitude": latitude,
+            "longitude": longitude,
             "dateStr": now.strftime("%Y-%m-%d"),
-            "hour": str(now.hour),
+            "hour": now.hour,
         }
 
         _LOGGER.debug("Sending request to Sun Time API (/calculate): %s", payload)
@@ -583,6 +588,7 @@ class SSMSunTimeSensor(SensorEntity):
             partial_shade = safe_times.get("lite skugga")
             full_shade = safe_times.get("mycket skugga")
 
+            # Main state is location/date/hour based direct-sun safe time.
             self._attr_native_value = direct_sun
             self._attr_extra_state_attributes["shade_direct_sun"] = direct_sun
             self._attr_extra_state_attributes["shade_partial"] = partial_shade
@@ -610,8 +616,8 @@ class SSMSunTimeSensor(SensorEntity):
             return
 
         payload = {
-            "skintypeId": str(self._skin_type),
-            "uvIndex": str(uv_index),
+            "skintypeId": int(self._skin_type),
+            "uvIndex": uv_index,
         }
 
         _LOGGER.debug(
@@ -641,6 +647,8 @@ class SSMSunTimeSensor(SensorEntity):
                 data.get("result", {}).get("safeTimeResults", [])
             )
 
+            # Index-based values are supplementary attributes only.
+            # Do not override the main state; location-based /calculate is preferred.
             self._attr_extra_state_attributes["i_shade_direct_sun"] = safe_times.get(
                 "direkt solljus"
             )
@@ -650,6 +658,8 @@ class SSMSunTimeSensor(SensorEntity):
             self._attr_extra_state_attributes["i_shade_full"] = safe_times.get(
                 "mycket skugga"
             )
+            self._attr_extra_state_attributes["last_updated"] = _last_updated_iso()
+            self._attr_available = True
 
         except (ClientError, TimeoutError, ValueError, KeyError, TypeError) as error:
             _LOGGER.warning(
