@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Final
 
 from homeassistant.config_entries import ConfigEntry  # type: ignore
 from homeassistant.const import Platform  # type: ignore
@@ -10,7 +11,7 @@ from homeassistant.core import HomeAssistant  # type: ignore
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS: list[Platform] = [Platform.SENSOR]
+PLATFORMS: Final[list[Platform]] = [Platform.SENSOR]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

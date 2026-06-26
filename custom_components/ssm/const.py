@@ -4,27 +4,27 @@ from __future__ import annotations
 
 from typing import Final, NotRequired, TypedDict
 
-DOMAIN: Final = "ssm"
+DOMAIN: Final[str] = "ssm"
 
-CONF_STATION: Final = "station"
-CONF_LOCATION: Final = "location"
-CONF_SKIN_TYPE: Final = "skin_type"
+CONF_STATION: Final[str] = "station"
+CONF_LOCATION: Final[str] = "location"
+CONF_SKIN_TYPE: Final[str] = "skin_type"
 
-DEFAULT_NAME: Final = "SSM"
+DEFAULT_NAME: Final[str] = "SSM"
 
-MANUFACTURER: Final = "Swedish Radiation Safety Authority"
-MODEL: Final = "Radiation and UV Monitor"
+MANUFACTURER: Final[str] = "Swedish Radiation Safety Authority"
+MODEL: Final[str] = "Radiation and UV Monitor"
 
-RADIATION_HISTORY_URL: Final = (
+RADIATION_HISTORY_URL: Final[str] = (
     "https://karttjanst.ssm.se/data/getHistoryForStation"
 )
-UV_INDEX_URL: Final = (
+UV_INDEX_URL: Final[str] = (
     "https://www.stralsakerhetsmyndigheten.se/api/uvindex/{location}"
 )
-SUN_TIME_CALCULATE_URL: Final = (
+SUN_TIME_CALCULATE_URL: Final[str] = (
     "https://www.stralsakerhetsmyndigheten.se/api/v1/suntime/calculate"
 )
-SUN_TIME_CALCULATE_WITH_INDEX_URL: Final = (
+SUN_TIME_CALCULATE_WITH_INDEX_URL: Final[str] = (
     "https://www.stralsakerhetsmyndigheten.se/api/v1/suntime/calculatewithindex"
 )
 

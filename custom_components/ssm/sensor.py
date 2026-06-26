@@ -1,6 +1,6 @@
 """Sensor platform for Swedish Radiation Safety Authority integration."""
 
-# pylint: disable=C0301, E0401, R0902, R0903, R0912, R0913, R0914, R0915, R0917, W0718
+# pylint: disable=C0301, E0401, R0902, R0903, R0911, R0912, R0913, R0914, R0915, R0917, W0718
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from typing import Any
 from urllib.parse import quote
 from zoneinfo import ZoneInfo
 
-from aiohttp import ClientError  # type: ignore
+from aiohttp import ClientError, ClientSession  # type: ignore
 
 from homeassistant.components.sensor import (  # type: ignore
     SensorEntity,
@@ -45,28 +45,33 @@ SCAN_INTERVAL = timedelta(minutes=30)
 STOCKHOLM_TIMEZONE = ZoneInfo("Europe/Stockholm")
 
 
+def _entry_string_value(
+    config_entry: ConfigEntry,
+    key: str,
+    default: str | None = None,
+) -> str | None:
+    """Return a config entry value as a string."""
+    value = config_entry.options.get(
+        key,
+        config_entry.data.get(key, default),
+    )
+
+    return value if isinstance(value, str) else default
+
+
 async def async_setup_entry(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     """Set up SSM sensors based on a config entry."""
-    name = config_entry.options.get(
-        CONF_NAME,
-        config_entry.data.get(CONF_NAME, "SSM"),
-    )
-    station = config_entry.options.get(
-        CONF_STATION,
-        config_entry.data.get(CONF_STATION),
-    )
-    location = config_entry.options.get(
-        CONF_LOCATION,
-        config_entry.data.get(CONF_LOCATION),
-    )
-    skin_type = config_entry.options.get(
-        CONF_SKIN_TYPE,
-        config_entry.data.get(CONF_SKIN_TYPE),
-    )
+    name = _entry_string_value(config_entry, CONF_NAME, "SSM")
+    station = _entry_string_value(config_entry, CONF_STATION)
+    location = _entry_string_value(config_entry, CONF_LOCATION)
+    skin_type = _entry_string_value(config_entry, CONF_SKIN_TYPE)
+
+    if name is None:
+        name = "SSM"
 
     session = async_get_clientsession(hass)
     entities: list[SensorEntity] = []
@@ -157,7 +162,9 @@ class SSMRadiationSensor(SensorEntity):
     _attr_translation_key = "radiation_level"
     _unrecorded_attributes = frozenset({"last_updated"})
 
-    def __init__(self, session, name: str, station: str, entry_id: str) -> None:
+    def __init__(
+        self, session: ClientSession, name: str, station: str, entry_id: str
+    ) -> None:
         """Initialize the sensor."""
         self._session = session
         self._station = station
@@ -301,7 +308,9 @@ class SSMUVIndexSensor(SensorEntity):
     _attr_translation_key = "uv_index"
     _unrecorded_attributes = frozenset({"hourly_forecast", "last_updated"})
 
-    def __init__(self, session, name: str, location: str, entry_id: str) -> None:
+    def __init__(
+        self, session: ClientSession, name: str, location: str, entry_id: str
+    ) -> None:
         """Initialize the sensor."""
         self._session = session
         self._location = location
@@ -474,7 +483,7 @@ class SSMSunTimeSensor(SensorEntity):
 
     def __init__(
         self,
-        session,
+        session: ClientSession,
         name: str,
         skin_type: str,
         uv_sensor: SSMUVIndexSensor,
@@ -528,7 +537,9 @@ class SSMSunTimeSensor(SensorEntity):
         return int(round(float(current_uv)))
 
     @staticmethod
-    def _parse_safe_times(results: list[dict[str, Any]]) -> dict[str, int | float | None]:
+    def _parse_safe_times(
+        results: list[dict[str, Any]],
+    ) -> dict[str, int | float | None]:
         """Parse safe times from the SSM sun time API response."""
         safe_times = {
             "direkt solljus": None,
@@ -628,7 +639,8 @@ class SSMSunTimeSensor(SensorEntity):
         uv_index = self._get_uv_index()
         if uv_index is None:
             _LOGGER.debug(
-                "Skipping Sun Time API (/calculatewithindex) due to unavailable UV index."
+                "Skipping Sun Time API (/calculatewithindex) due to "
+                "unavailable UV index."
             )
             return False
 
@@ -649,7 +661,8 @@ class SSMSunTimeSensor(SensorEntity):
             ) as response:
                 if response.status != 200:
                     _LOGGER.warning(
-                        "Failed to fetch Sun Time API (/calculatewithindex) response: %s",
+                        "Failed to fetch Sun Time API (/calculatewithindex) "
+                        "response: %s",
                         response.status,
                     )
                     return False
@@ -682,8 +695,9 @@ class SSMSunTimeSensor(SensorEntity):
             self._attr_extra_state_attributes["last_updated"] = _last_updated_iso()
 
             if prefer_as_state:
-                # Fallback mode: no official sun-time coordinates exist for this UV location.
-                # Use current-UV-index based direct-sun safe time as the entity state.
+                # Fallback mode: no official sun-time coordinates exist for
+                # this UV location. Use the UV-index based direct-sun safe
+                # time as the entity state.
                 self._attr_native_value = index_direct_sun
 
             return True
