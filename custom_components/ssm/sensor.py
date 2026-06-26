@@ -45,32 +45,16 @@ STOCKHOLM_TIMEZONE = ZoneInfo("Europe/Stockholm")
 
 
 def _entry_string_value(
-    config_entry: ConfigEntry,
-    key: str,
-    default: str | None = None,
-) -> str | None:
-    """Return a config entry value as a string."""
-    value = config_entry.options.get(
-        key,
-        config_entry.data.get(key, default),
-    )
-
-    return value if isinstance(value, str) else default
-
-
 async def async_setup_entry(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     """Set up SSM sensors based on a config entry."""
-    name = _entry_string_value(config_entry, CONF_NAME, "SSM")
+    name = _entry_string_value(config_entry, CONF_NAME, "SSM") or "SSM"
     station = _entry_string_value(config_entry, CONF_STATION)
     location = _entry_string_value(config_entry, CONF_LOCATION)
     skin_type = _entry_string_value(config_entry, CONF_SKIN_TYPE)
-
-    if name is None:
-        name = "SSM"
 
     session = async_get_clientsession(hass)
     entities: list[SensorEntity] = []
@@ -113,6 +97,20 @@ async def async_setup_entry(
 def _last_updated_iso() -> str:
     """Return current UTC timestamp as ISO string."""
     return datetime.now(UTC).isoformat()
+
+
+def _entry_string_value(
+    config_entry: ConfigEntry,
+    key: str,
+    default: str | None = None,
+) -> str | None:
+    """Return a config entry option or data value as a string."""
+    value = config_entry.options.get(key, config_entry.data.get(key, default))
+
+    if value is None:
+        return default
+
+    return str(value)
 
 
 def _to_number(value: Any) -> int | float | None:
@@ -162,7 +160,11 @@ class SSMRadiationSensor(SensorEntity):
     _unrecorded_attributes = frozenset({"last_updated"})
 
     def __init__(
-        self, session: ClientSession, name: str, station: str, entry_id: str
+        self,
+        session: ClientSession,
+        name: str,
+        station: str,
+        entry_id: str,
     ) -> None:
         """Initialize the sensor."""
         self._session = session
@@ -315,7 +317,7 @@ class SSMUVIndexSensor(SensorEntity):
         self._attr_native_value = None
         self._attr_available = True
         self._attr_device_info = _device_info(entry_id, name)
-        self._attr_extra_state_attributes = {
+        self._attr_extra_state_attributes: dict[str, Any] = {
             "current_uv": None,
             "max_uv_today": None,
             "max_uv_time": None,
@@ -430,12 +432,12 @@ class SSMUVIndexSensor(SensorEntity):
                 return
 
             max_uv_time = today_data.get("maxUvIndexTime")
-            max_time_formatted = None
+            max_time_formatted: str | None = None
             if max_uv_time:
                 max_time_obj = datetime.strptime(max_uv_time, "%Y-%m-%dT%H:%M:%S")
                 max_time_formatted = max_time_obj.strftime("%H:%M")
 
-            max_uv_tomorrow = None
+            max_uv_tomorrow: int | float | None = None
             if len(dates) > 1:
                 max_uv_tomorrow = _to_number(dates[1].get("maxUvIndex"))
 
@@ -500,7 +502,7 @@ class SSMSunTimeSensor(SensorEntity):
         self._attr_native_value = None
         self._attr_available = True
         self._attr_device_info = _device_info(entry_id, name)
-        self._attr_extra_state_attributes = {
+        self._attr_extra_state_attributes: dict[str, Any] = {
             "shade_direct_sun": None,
             "shade_partial": None,
             "shade_full": None,
@@ -536,11 +538,9 @@ class SSMSunTimeSensor(SensorEntity):
         return int(round(float(current_uv)))
 
     @staticmethod
-    def _parse_safe_times(
-        results: list[dict[str, Any]],
-    ) -> dict[str, int | float | None]:
+    def _parse_safe_times(results: list[dict[str, Any]]) -> dict[str, int | float | None]:
         """Parse safe times from the SSM sun time API response."""
-        safe_times = {
+        safe_times: dict[str, int | float | None] = {
             "direkt solljus": None,
             "lite skugga": None,
             "mycket skugga": None,
@@ -565,6 +565,9 @@ class SSMSunTimeSensor(SensorEntity):
                 "skipping location-based calculation.",
                 self._location,
             )
+            self._attr_extra_state_attributes["shade_direct_sun"] = None
+            self._attr_extra_state_attributes["shade_partial"] = None
+            self._attr_extra_state_attributes["shade_full"] = None
             return False
 
         payload = {
@@ -587,6 +590,9 @@ class SSMSunTimeSensor(SensorEntity):
                         "Failed to fetch Sun Time API (/calculate) response: %s",
                         response.status,
                     )
+                    self._attr_extra_state_attributes["shade_direct_sun"] = None
+                    self._attr_extra_state_attributes["shade_partial"] = None
+                    self._attr_extra_state_attributes["shade_full"] = None
                     return False
 
                 data = await response.json()
@@ -609,6 +615,9 @@ class SSMSunTimeSensor(SensorEntity):
                     "direct-sun safe time: %s",
                     data,
                 )
+                self._attr_extra_state_attributes["shade_direct_sun"] = None
+                self._attr_extra_state_attributes["shade_partial"] = None
+                self._attr_extra_state_attributes["shade_full"] = None
                 return False
 
             # Main state is location/date/hour based direct-sun safe time.
@@ -622,12 +631,18 @@ class SSMSunTimeSensor(SensorEntity):
 
         except (ClientError, TimeoutError, ValueError, KeyError, TypeError) as error:
             _LOGGER.warning("Error calling Sun Time API (/calculate): %s", error)
+            self._attr_extra_state_attributes["shade_direct_sun"] = None
+            self._attr_extra_state_attributes["shade_partial"] = None
+            self._attr_extra_state_attributes["shade_full"] = None
             return False
         except Exception as error:
             _LOGGER.exception(
                 "Unexpected error calling Sun Time API (/calculate): %s",
                 error,
             )
+            self._attr_extra_state_attributes["shade_direct_sun"] = None
+            self._attr_extra_state_attributes["shade_partial"] = None
+            self._attr_extra_state_attributes["shade_full"] = None
             return False
 
     async def _update_from_index_calculation(
@@ -641,6 +656,9 @@ class SSMSunTimeSensor(SensorEntity):
                 "Skipping Sun Time API (/calculatewithindex) due to "
                 "unavailable UV index."
             )
+            self._attr_extra_state_attributes["i_shade_direct_sun"] = None
+            self._attr_extra_state_attributes["i_shade_partial"] = None
+            self._attr_extra_state_attributes["i_shade_full"] = None
             return False
 
         payload = {
@@ -664,6 +682,9 @@ class SSMSunTimeSensor(SensorEntity):
                         "response: %s",
                         response.status,
                     )
+                    self._attr_extra_state_attributes["i_shade_direct_sun"] = None
+                    self._attr_extra_state_attributes["i_shade_partial"] = None
+                    self._attr_extra_state_attributes["i_shade_full"] = None
                     return False
 
                 data = await response.json()
@@ -686,6 +707,9 @@ class SSMSunTimeSensor(SensorEntity):
                     "direct-sun safe time: %s",
                     data,
                 )
+                self._attr_extra_state_attributes["i_shade_direct_sun"] = None
+                self._attr_extra_state_attributes["i_shade_partial"] = None
+                self._attr_extra_state_attributes["i_shade_full"] = None
                 return False
 
             self._attr_extra_state_attributes["i_shade_direct_sun"] = index_direct_sun
@@ -694,9 +718,8 @@ class SSMSunTimeSensor(SensorEntity):
             self._attr_extra_state_attributes["last_updated"] = _last_updated_iso()
 
             if prefer_as_state:
-                # Fallback mode: no official sun-time coordinates exist for
-                # this UV location. Use the UV-index based direct-sun safe
-                # time as the entity state.
+                # Fallback mode: no official sun-time coordinates exist.
+                # Use current-UV-index safe time as the entity state.
                 self._attr_native_value = index_direct_sun
 
             return True
@@ -706,12 +729,18 @@ class SSMSunTimeSensor(SensorEntity):
                 "Error calling Sun Time API (/calculatewithindex): %s",
                 error,
             )
+            self._attr_extra_state_attributes["i_shade_direct_sun"] = None
+            self._attr_extra_state_attributes["i_shade_partial"] = None
+            self._attr_extra_state_attributes["i_shade_full"] = None
             return False
         except Exception as error:
             _LOGGER.exception(
                 "Unexpected error calling Sun Time API (/calculatewithindex): %s",
                 error,
             )
+            self._attr_extra_state_attributes["i_shade_direct_sun"] = None
+            self._attr_extra_state_attributes["i_shade_partial"] = None
+            self._attr_extra_state_attributes["i_shade_full"] = None
             return False
 
     async def async_update(self) -> None:
@@ -727,3 +756,4 @@ class SSMSunTimeSensor(SensorEntity):
 
         if not self._attr_available:
             self._attr_native_value = None
+            self._attr_extra_state_attributes["last_updated"] = _last_updated_iso()
