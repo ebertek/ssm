@@ -9,7 +9,6 @@ import uuid
 from typing import Any
 
 import voluptuous as vol  # type: ignore
-
 from homeassistant import config_entries  # type: ignore
 from homeassistant.config_entries import ConfigEntry, ConfigFlowResult  # type: ignore
 from homeassistant.const import CONF_NAME  # type: ignore
@@ -70,17 +69,13 @@ async def validate_input(
 
 def _station_options() -> list[dict[str, str]]:
     """Return station selector options."""
-    return [
-        {"value": station["id"], "label": station["name"]}
-        for station in STATIONS
-    ]
+    return [{"value": station["id"], "label": station["name"]} for station in STATIONS]
 
 
 def _location_options() -> list[dict[str, str]]:
     """Return location selector options."""
     return [
-        {"value": location["id"], "label": location["name"]}
-        for location in LOCATIONS
+        {"value": location["id"], "label": location["name"]} for location in LOCATIONS
     ]
 
 

@@ -11,7 +11,6 @@ from urllib.parse import quote
 from zoneinfo import ZoneInfo
 
 from aiohttp import ClientError, ClientSession  # type: ignore
-
 from homeassistant.components.sensor import (  # type: ignore
     SensorEntity,
     SensorStateClass,
@@ -273,15 +272,9 @@ class SSMRadiationSensor(SensorEntity):
                 avg_value = sum(valid_values) / len(valid_values)
 
                 self._attr_native_value = round(latest_value * 1000)
-                self._attr_extra_state_attributes["min_level"] = round(
-                    min_value * 1000
-                )
-                self._attr_extra_state_attributes["max_level"] = round(
-                    max_value * 1000
-                )
-                self._attr_extra_state_attributes["avg_level"] = round(
-                    avg_value * 1000
-                )
+                self._attr_extra_state_attributes["min_level"] = round(min_value * 1000)
+                self._attr_extra_state_attributes["max_level"] = round(max_value * 1000)
+                self._attr_extra_state_attributes["avg_level"] = round(avg_value * 1000)
                 self._attr_extra_state_attributes["last_updated"] = _last_updated_iso()
                 self._attr_available = True
                 return
@@ -295,7 +288,9 @@ class SSMRadiationSensor(SensorEntity):
             _LOGGER.warning("Error updating SSM Radiation sensor: %s", error)
             self._attr_available = False
         except Exception as error:
-            _LOGGER.exception("Unexpected error updating SSM Radiation sensor: %s", error)
+            _LOGGER.exception(
+                "Unexpected error updating SSM Radiation sensor: %s", error
+            )
             self._attr_available = False
 
 
@@ -404,7 +399,9 @@ class SSMUVIndexSensor(SensorEntity):
             dates = location_data["date"]
 
             if not dates:
-                _LOGGER.error("No UV date data received from SSM UV Index API: %s", data)
+                _LOGGER.error(
+                    "No UV date data received from SSM UV Index API: %s", data
+                )
                 self._attr_available = False
                 return
 
@@ -467,7 +464,9 @@ class SSMUVIndexSensor(SensorEntity):
             _LOGGER.error("Error updating SSM UV Index sensor: %s", error)
             self._attr_available = False
         except Exception as error:
-            _LOGGER.exception("Unexpected error updating SSM UV Index sensor: %s", error)
+            _LOGGER.exception(
+                "Unexpected error updating SSM UV Index sensor: %s", error
+            )
             self._attr_available = False
 
 
