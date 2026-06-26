@@ -171,7 +171,7 @@ class SSMRadiationSensor(SensorEntity):
 
         self._attr_name = "Radiation Level"
         self._attr_unique_id = f"{entry_id}_radiation"
-        self._attr_native_value = None
+        self._attr_native_value: int | float | None = None
         self._attr_available = True
         self._attr_device_info = _device_info(entry_id, name)
         self._attr_extra_state_attributes: dict[str, Any] = {
@@ -313,7 +313,7 @@ class SSMUVIndexSensor(SensorEntity):
 
         self._attr_name = "UV Index"
         self._attr_unique_id = f"{entry_id}_uv_index"
-        self._attr_native_value = None
+        self._attr_native_value: int | float | None = None
         self._attr_available = True
         self._attr_device_info = _device_info(entry_id, name)
         self._attr_extra_state_attributes: dict[str, Any] = {
@@ -498,7 +498,7 @@ class SSMSunTimeSensor(SensorEntity):
 
         self._attr_name = "Min soltid"
         self._attr_unique_id = f"{entry_id}_sun_time"
-        self._attr_native_value = None
+        self._attr_native_value: int | float | None = None
         self._attr_available = True
         self._attr_device_info = _device_info(entry_id, name)
         self._attr_extra_state_attributes: dict[str, Any] = {
