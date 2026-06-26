@@ -140,7 +140,7 @@ class SSMConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
 
     @staticmethod
     @callback
-    def async_get_options_flow(config_entry):
+    def async_get_options_flow(_config_entry):
         """Get the options flow for this handler."""
         return SSMOptionsFlow()
 
