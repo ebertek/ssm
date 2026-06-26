@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Final, TypedDict
+from typing import Final, NotRequired, TypedDict
 
 DOMAIN: Final = "ssm"
 
@@ -37,13 +37,13 @@ class StationDescription(TypedDict):
 
 
 class LocationDescription(TypedDict):
-    """UV index and sun-time location description."""
+    """UV index and optional sun-time location description."""
 
     id: str
     name: str
     api_name: str
-    latitude: float
-    longitude: float
+    sun_time_latitude: NotRequired[float]
+    sun_time_longitude: NotRequired[float]
 
 
 class SkinTypeDescription(TypedDict):
@@ -86,53 +86,128 @@ STATIONS: Final[list[StationDescription]] = [
 
 LOCATIONS: Final[list[LocationDescription]] = [
     {
+        "id": "sverige-abisko",
+        "name": "Abisko",
+        "api_name": "Sverige (Abisko)",
+    },
+    {
         "id": "sverige-gotland",
         "name": "Gotland",
         "api_name": "Sverige (Gotland)",
-        "latitude": 57.4716204656831,
-        "longitude": 18.4844815904125,
+        "sun_time_latitude": 57.4716204656831,
+        "sun_time_longitude": 18.4844815904125,
+    },
+    {
+        "id": "sverige-gavle",
+        "name": "Gävle",
+        "api_name": "Sverige (Gävle)",
     },
     {
         "id": "sverige-goteborg",
         "name": "Göteborg",
         "api_name": "Sverige (Göteborg)",
-        "latitude": 57.7095511309657,
-        "longitude": 11.9623858055224,
+        "sun_time_latitude": 57.7095511309657,
+        "sun_time_longitude": 11.9623858055224,
+    },
+    {
+        "id": "sverige-halmstad",
+        "name": "Halmstad",
+        "api_name": "Sverige (Halmstad)",
+    },
+    {
+        "id": "sverige-idre-fjall",
+        "name": "Idre Fjäll",
+        "api_name": "Sverige (Idre Fjäll)",
+    },
+    {
+        "id": "sverige-jonkoping",
+        "name": "Jönköping",
+        "api_name": "Sverige (Jönköping)",
+    },
+    {
+        "id": "sverige-karlstad",
+        "name": "Karlstad",
+        "api_name": "Sverige (Karlstad)",
+    },
+    {
+        "id": "sverige-kebnekaise",
+        "name": "Kebnekaise",
+        "api_name": "Sverige (Kebnekaise)",
     },
     {
         "id": "sverige-malmo",
         "name": "Malmö",
         "api_name": "Sverige (Malmö)",
-        "latitude": 55.6054274073227,
-        "longitude": 12.9816074029767,
+        "sun_time_latitude": 55.6054274073227,
+        "sun_time_longitude": 12.9816074029767,
+    },
+    {
+        "id": "sverige-mora",
+        "name": "Mora",
+        "api_name": "Sverige (Mora)",
     },
     {
         "id": "sverige-polcirkeln",
         "name": "Polcirkeln",
         "api_name": "Sverige (Polcirkeln)",
-        "latitude": 66.5690137250601,
-        "longitude": 21.0187913396622,
+        "sun_time_latitude": 66.5690137250601,
+        "sun_time_longitude": 21.0187913396622,
+    },
+    {
+        "id": "sverige-riksgransen",
+        "name": "Riksgränsen",
+        "api_name": "Sverige (Riksgränsen)",
     },
     {
         "id": "sverige-stockholm",
         "name": "Stockholm",
         "api_name": "Sverige (Stockholm)",
-        "latitude": 59.3325654896463,
-        "longitude": 18.0669553866814,
+        "sun_time_latitude": 59.3325654896463,
+        "sun_time_longitude": 18.0669553866814,
+    },
+    {
+        "id": "sverige-sundsvall",
+        "name": "Sundsvall",
+        "api_name": "Sverige (Sundsvall)",
+    },
+    {
+        "id": "sverige-salen",
+        "name": "Sälen",
+        "api_name": "Sverige (Sälen)",
+    },
+    {
+        "id": "sverige-tanndalen",
+        "name": "Tänndalen",
+        "api_name": "Sverige (Tänndalen)",
+    },
+    {
+        "id": "sverige-umea",
+        "name": "Umeå",
+        "api_name": "Sverige (Umeå)",
+    },
+    {
+        "id": "sverige-vemdalen",
+        "name": "Vemdalen",
+        "api_name": "Sverige (Vemdalen)",
     },
     {
         "id": "sverige-oland",
         "name": "Öland",
         "api_name": "Sverige (Öland)",
-        "latitude": 56.6661070100662,
-        "longitude": 16.61967362829,
+        "sun_time_latitude": 56.6661070100662,
+        "sun_time_longitude": 16.61967362829,
+    },
+    {
+        "id": "sverige-orebro",
+        "name": "Örebro",
+        "api_name": "Sverige (Örebro)",
     },
     {
         "id": "sverige-ostersund",
         "name": "Östersund",
         "api_name": "Sverige (Östersund)",
-        "latitude": 63.177187907826,
-        "longitude": 14.6358205656499,
+        "sun_time_latitude": 63.177187907826,
+        "sun_time_longitude": 14.6358205656499,
     },
 ]
 

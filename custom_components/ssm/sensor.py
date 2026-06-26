@@ -503,14 +503,19 @@ class SSMSunTimeSensor(SensorEntity):
         }
 
     @staticmethod
-    def _get_location_coordinates(location_id: str) -> tuple[float | None, float | None]:
-        """Get latitude and longitude for a given location ID."""
+    def _get_sun_time_coordinates(
+        location_id: str,
+    ) -> tuple[float | None, float | None]:
+        """Get official sun-time latitude and longitude for a given location ID."""
         location = next((loc for loc in LOCATIONS if loc["id"] == location_id), None)
 
         if location is None:
             return None, None
 
-        return location["latitude"], location["longitude"]
+        return (
+            location.get("sun_time_latitude"),
+            location.get("sun_time_longitude"),
+        )
 
     def _get_uv_index(self) -> int | None:
         """Return the current UV index from the UV sensor."""
@@ -540,15 +545,17 @@ class SSMSunTimeSensor(SensorEntity):
 
         return safe_times
 
-    async def async_update(self) -> None:
-        """Get the latest data from the API and update the state."""
-        latitude, longitude = self._get_location_coordinates(self._location)
-        if latitude is None or longitude is None:
-            _LOGGER.error("Coordinates not found for location: %s", self._location)
-            self._attr_available = False
-            return
+    async def _update_from_location_calculation(self, now: datetime) -> bool:
+        """Update sun-time values from location/date/hour based calculation."""
+        latitude, longitude = self._get_sun_time_coordinates(self._location)
 
-        now = datetime.now(STOCKHOLM_TIMEZONE)
+        if latitude is None or longitude is None:
+            _LOGGER.debug(
+                "No official sun-time coordinates for location %s; "
+                "skipping location-based calculation.",
+                self._location,
+            )
+            return False
 
         payload = {
             "skintypeId": int(self._skin_type),
@@ -566,13 +573,11 @@ class SSMSunTimeSensor(SensorEntity):
                 json=payload,
             ) as response:
                 if response.status != 200:
-                    _LOGGER.error(
+                    _LOGGER.warning(
                         "Failed to fetch Sun Time API (/calculate) response: %s",
                         response.status,
                     )
-                    self._attr_native_value = None
-                    self._attr_available = False
-                    return
+                    return False
 
                 data = await response.json()
                 _LOGGER.debug(
@@ -588,32 +593,44 @@ class SSMSunTimeSensor(SensorEntity):
             partial_shade = safe_times.get("lite skugga")
             full_shade = safe_times.get("mycket skugga")
 
+            if direct_sun is None:
+                _LOGGER.warning(
+                    "Location-based Sun Time API response did not contain "
+                    "direct-sun safe time: %s",
+                    data,
+                )
+                return False
+
             # Main state is location/date/hour based direct-sun safe time.
             self._attr_native_value = direct_sun
             self._attr_extra_state_attributes["shade_direct_sun"] = direct_sun
             self._attr_extra_state_attributes["shade_partial"] = partial_shade
             self._attr_extra_state_attributes["shade_full"] = full_shade
             self._attr_extra_state_attributes["last_updated"] = _last_updated_iso()
-            self._attr_available = True
+
+            return True
 
         except (ClientError, TimeoutError, ValueError, KeyError, TypeError) as error:
-            _LOGGER.error("Error calling Sun Time API (/calculate): %s", error)
-            self._attr_available = False
-            return
+            _LOGGER.warning("Error calling Sun Time API (/calculate): %s", error)
+            return False
         except Exception as error:
             _LOGGER.exception(
                 "Unexpected error calling Sun Time API (/calculate): %s",
                 error,
             )
-            self._attr_available = False
-            return
+            return False
 
+    async def _update_from_index_calculation(
+        self,
+        prefer_as_state: bool,
+    ) -> bool:
+        """Update sun-time values from current UV-index based calculation."""
         uv_index = self._get_uv_index()
         if uv_index is None:
             _LOGGER.debug(
                 "Skipping Sun Time API (/calculatewithindex) due to unavailable UV index."
             )
-            return
+            return False
 
         payload = {
             "skintypeId": int(self._skin_type),
@@ -635,7 +652,7 @@ class SSMSunTimeSensor(SensorEntity):
                         "Failed to fetch Sun Time API (/calculatewithindex) response: %s",
                         response.status,
                     )
-                    return
+                    return False
 
                 data = await response.json()
                 _LOGGER.debug(
@@ -647,27 +664,53 @@ class SSMSunTimeSensor(SensorEntity):
                 data.get("result", {}).get("safeTimeResults", [])
             )
 
-            # Index-based values are supplementary attributes only.
-            # Do not override the main state; location-based /calculate is preferred.
-            self._attr_extra_state_attributes["i_shade_direct_sun"] = safe_times.get(
-                "direkt solljus"
-            )
-            self._attr_extra_state_attributes["i_shade_partial"] = safe_times.get(
-                "lite skugga"
-            )
-            self._attr_extra_state_attributes["i_shade_full"] = safe_times.get(
-                "mycket skugga"
-            )
+            index_direct_sun = safe_times.get("direkt solljus")
+            index_partial_shade = safe_times.get("lite skugga")
+            index_full_shade = safe_times.get("mycket skugga")
+
+            if index_direct_sun is None:
+                _LOGGER.warning(
+                    "Index-based Sun Time API response did not contain "
+                    "direct-sun safe time: %s",
+                    data,
+                )
+                return False
+
+            self._attr_extra_state_attributes["i_shade_direct_sun"] = index_direct_sun
+            self._attr_extra_state_attributes["i_shade_partial"] = index_partial_shade
+            self._attr_extra_state_attributes["i_shade_full"] = index_full_shade
             self._attr_extra_state_attributes["last_updated"] = _last_updated_iso()
-            self._attr_available = True
+
+            if prefer_as_state:
+                # Fallback mode: no official sun-time coordinates exist for this UV location.
+                # Use current-UV-index based direct-sun safe time as the entity state.
+                self._attr_native_value = index_direct_sun
+
+            return True
 
         except (ClientError, TimeoutError, ValueError, KeyError, TypeError) as error:
             _LOGGER.warning(
                 "Error calling Sun Time API (/calculatewithindex): %s",
                 error,
             )
+            return False
         except Exception as error:
             _LOGGER.exception(
                 "Unexpected error calling Sun Time API (/calculatewithindex): %s",
                 error,
             )
+            return False
+
+    async def async_update(self) -> None:
+        """Get the latest data from the API and update the state."""
+        now = datetime.now(STOCKHOLM_TIMEZONE)
+
+        location_updated = await self._update_from_location_calculation(now)
+        index_updated = await self._update_from_index_calculation(
+            prefer_as_state=not location_updated
+        )
+
+        self._attr_available = location_updated or index_updated
+
+        if not self._attr_available:
+            self._attr_native_value = None
