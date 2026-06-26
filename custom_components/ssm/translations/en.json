@@ -3,36 +3,39 @@
   "config": {
     "step": {
       "user": {
-        "title": "Connect to SSM Data",
+        "title": "Connect to SSM data",
         "description": "Set up the Swedish Radiation Safety Authority integration to monitor radiation and UV data.",
         "data": {
           "name": "Name",
-          "station": "Station for Radiation Data",
-          "location": "Location Name for UV Index",
-          "skin_type": "Skin Type"
+          "station": "Station for radiation data",
+          "location": "Location for UV index",
+          "skin_type": "Skin type"
         }
       }
     },
     "error": {
-      "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
-      "invalid_auth": "[%key:common::config_flow::error::invalid_auth%]",
-      "unknown": "[%key:common::config_flow::error::unknown%]"
+      "cannot_connect": "The selected SSM configuration is invalid.",
+      "unknown": "Unexpected error"
     },
     "abort": {
-      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+      "already_configured": "This SSM configuration is already configured."
     }
   },
   "options": {
     "step": {
       "init": {
-        "title": "SSM Integration Options",
-        "description": "Update your radiation and UV monitoring settings",
+        "title": "SSM integration options",
+        "description": "Update your radiation and UV monitoring settings.",
         "data": {
-          "station": "Station for Radiation Data",
-          "location": "Location Name for UV Index",
-          "skin_type": "Skin Type"
+          "station": "Station for radiation data",
+          "location": "Location for UV index",
+          "skin_type": "Skin type"
         }
       }
+    },
+    "error": {
+      "cannot_connect": "The selected SSM configuration is invalid.",
+      "unknown": "Unexpected error"
     }
   },
   "selector": {
@@ -64,8 +67,8 @@
         "3": "Tännäs",
         "24": "Visingsö",
         "1277": "Växjö",
-        "23": "Öland's Northern Cape",
-        "13": "Öland's Southern Cape"
+        "23": "Öland's northern cape",
+        "13": "Öland's southern cape"
       }
     },
     "location": {
@@ -120,13 +123,13 @@
             "name": "In full shade (latitude)"
           },
           "i_shade_direct_sun": {
-            "name": "In direct sun (index)"
+            "name": "In direct sun (UV index)"
           },
           "i_shade_partial": {
-            "name": "In partial shade (index)"
+            "name": "In partial shade (UV index)"
           },
           "i_shade_full": {
-            "name": "In full shade (index)"
+            "name": "In full shade (UV index)"
           },
           "last_updated": {
             "name": "Last updated"
@@ -134,7 +137,7 @@
         }
       },
       "uv_index": {
-        "name": "UV Index",
+        "name": "UV index",
         "state_attributes": {
           "current_uv": {
             "name": "Current UV"
@@ -143,7 +146,7 @@
             "name": "Max UV today"
           },
           "max_uv_time": {
-            "name": "Time of Peak UV"
+            "name": "Time of peak UV"
           },
           "max_uv_tomorrow": {
             "name": "Max UV tomorrow"
@@ -155,7 +158,7 @@
             "name": "Risk level",
             "state": {
               "extreme": "Extreme",
-              "very_high": "Very High",
+              "very_high": "Very high",
               "high": "High",
               "moderate": "Moderate",
               "low": "Low",
@@ -168,7 +171,7 @@
         }
       },
       "radiation_level": {
-        "name": "Radiation Level",
+        "name": "Radiation level",
         "state_attributes": {
           "min_level": {
             "name": "Minimum level"

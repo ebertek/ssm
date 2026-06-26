@@ -1,17 +1,58 @@
 """Constants for the Swedish Radiation Safety Authority integration."""
 
-# pylint: disable=C0301
+from __future__ import annotations
 
-DOMAIN = "ssm"
+from typing import Final, TypedDict
 
-# Configuration constants
-CONF_STATION = "station"
-CONF_LOCATION = "location"
-CONF_SKIN_TYPE = "skin_type"
-DEFAULT_NAME = "SSM"
+DOMAIN: Final = "ssm"
 
-# Radiation measurement stations with their location IDs
-STATIONS = [
+CONF_STATION: Final = "station"
+CONF_LOCATION: Final = "location"
+CONF_SKIN_TYPE: Final = "skin_type"
+
+DEFAULT_NAME: Final = "SSM"
+
+MANUFACTURER: Final = "Swedish Radiation Safety Authority"
+MODEL: Final = "Radiation and UV Monitor"
+
+RADIATION_HISTORY_URL: Final = (
+    "https://karttjanst.ssm.se/data/getHistoryForStation"
+)
+UV_INDEX_URL: Final = (
+    "https://www.stralsakerhetsmyndigheten.se/api/uvindex/{location}"
+)
+SUN_TIME_CALCULATE_URL: Final = (
+    "https://www.stralsakerhetsmyndigheten.se/api/v1/suntime/calculate"
+)
+SUN_TIME_CALCULATE_WITH_INDEX_URL: Final = (
+    "https://www.stralsakerhetsmyndigheten.se/api/v1/suntime/calculatewithindex"
+)
+
+
+class StationDescription(TypedDict):
+    """Radiation measurement station description."""
+
+    id: str
+    name: str
+
+
+class LocationDescription(TypedDict):
+    """UV index location description."""
+
+    id: str
+    name: str
+    api_name: str
+    latitude: float
+
+
+class SkinTypeDescription(TypedDict):
+    """Skin type description."""
+
+    id: str
+    name: str
+
+
+STATIONS: Final[list[StationDescription]] = [
     {"id": "20", "name": "Bjuruklubb (Skellefteå)"},
     {"id": "5", "name": "Brämön"},
     {"id": "7", "name": "Fårösund"},
@@ -42,144 +83,142 @@ STATIONS = [
     {"id": "13", "name": "Ölands Södra Udde"},
 ]
 
-# UV index measurement locations with their API names and values
-LOCATIONS = [
+LOCATIONS: Final[list[LocationDescription]] = [
     {
         "id": "sverige-abisko",
         "name": "Abisko",
         "api_name": "Sverige (Abisko)",
-        "latitude": "68.4",
+        "latitude": 68.4,
     },
     {
         "id": "sverige-gotland",
         "name": "Gotland",
         "api_name": "Sverige (Gotland)",
-        "latitude": "57.621875",
+        "latitude": 57.621875,
     },
     {
         "id": "sverige-gavle",
         "name": "Gävle",
         "api_name": "Sverige (Gävle)",
-        "latitude": "60.8",
+        "latitude": 60.8,
     },
     {
         "id": "sverige-goteborg",
         "name": "Göteborg",
         "api_name": "Sverige (Göteborg)",
-        "latitude": "57.70887",
+        "latitude": 57.70887,
     },
     {
         "id": "sverige-halmstad",
         "name": "Halmstad",
         "api_name": "Sverige (Halmstad)",
-        "latitude": "56.8",
+        "latitude": 56.8,
     },
     {
         "id": "sverige-idre-fjall",
         "name": "Idre Fjäll",
         "api_name": "Sverige (Idre Fjäll)",
-        "latitude": "62",
+        "latitude": 62.0,
     },
     {
         "id": "sverige-jonkoping",
         "name": "Jönköping",
         "api_name": "Sverige (Jönköping)",
-        "latitude": "57.6",
+        "latitude": 57.6,
     },
     {
         "id": "sverige-karlstad",
         "name": "Karlstad",
         "api_name": "Sverige (Karlstad)",
-        "latitude": "59.2",
+        "latitude": 59.2,
     },
     {
         "id": "sverige-kebnekaise",
         "name": "Kebnekaise",
         "api_name": "Sverige (Kebnekaise)",
-        "latitude": "68",
+        "latitude": 68.0,
     },
     {
         "id": "sverige-malmo",
         "name": "Malmö",
         "api_name": "Sverige (Malmö)",
-        "latitude": "55.60498",
+        "latitude": 55.60498,
     },
     {
         "id": "sverige-mora",
         "name": "Mora",
         "api_name": "Sverige (Mora)",
-        "latitude": "61.2",
+        "latitude": 61.2,
     },
     {
         "id": "sverige-polcirkeln",
         "name": "Polcirkeln",
         "api_name": "Sverige (Polcirkeln)",
-        "latitude": "66.54772",
+        "latitude": 66.54772,
     },
     {
         "id": "sverige-riksgransen",
         "name": "Riksgränsen",
         "api_name": "Sverige (Riksgränsen)",
-        "latitude": "68.4",
+        "latitude": 68.4,
     },
     {
         "id": "sverige-stockholm",
         "name": "Stockholm",
         "api_name": "Sverige (Stockholm)",
-        "latitude": "59.32893",
+        "latitude": 59.32893,
     },
     {
         "id": "sverige-sundsvall",
         "name": "Sundsvall",
         "api_name": "Sverige (Sundsvall)",
-        "latitude": "62.4",
+        "latitude": 62.4,
     },
     {
         "id": "sverige-salen",
         "name": "Sälen",
         "api_name": "Sverige (Sälen)",
-        "latitude": "61.2",
+        "latitude": 61.2,
     },
     {
         "id": "sverige-tanndalen",
         "name": "Tänndalen",
         "api_name": "Sverige (Tänndalen)",
-        "latitude": "62.4",
+        "latitude": 62.4,
     },
     {
         "id": "sverige-umea",
         "name": "Umeå",
         "api_name": "Sverige (Umeå)",
-        "latitude": "64",
+        "latitude": 64.0,
     },
     {
         "id": "sverige-vemdalen",
         "name": "Vemdalen",
         "api_name": "Sverige (Vemdalen)",
-        "latitude": "62.4",
+        "latitude": 62.4,
     },
     {
         "id": "sverige-oland",
         "name": "Öland",
         "api_name": "Sverige (Öland)",
-        "latitude": "58.866991",
+        "latitude": 58.866991,
     },
     {
         "id": "sverige-orebro",
         "name": "Örebro",
         "api_name": "Sverige (Örebro)",
-        "latitude": "59.2",
+        "latitude": 59.2,
     },
     {
         "id": "sverige-ostersund",
         "name": "Östersund",
         "api_name": "Sverige (Östersund)",
-        "latitude": "63.17668",
+        "latitude": 63.17668,
     },
 ]
 
-# Skin types for Min soltid calculations
-SKIN_TYPES = [
+SKIN_TYPES: Final[list[SkinTypeDescription]] = [
     {"id": "1", "name": "Type 1 (Very fair, burns easily)"},
     {"id": "2", "name": "Type 2 (Fair, burns easily)"},
     {"id": "3", "name": "Type 3 (Medium, sometimes burns)"},

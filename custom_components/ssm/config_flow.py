@@ -2,15 +2,18 @@
 
 # pylint: disable=C0301, E0401, R0903, W0718, W0719
 
+from __future__ import annotations
+
 import logging
 import uuid
-from typing import Any, Dict
+from typing import Any
 
 import voluptuous as vol  # type: ignore
+
 from homeassistant import config_entries  # type: ignore
+from homeassistant.config_entries import ConfigEntry, ConfigFlowResult  # type: ignore
 from homeassistant.const import CONF_NAME  # type: ignore
 from homeassistant.core import HomeAssistant, callback  # type: ignore
-from homeassistant.helpers.aiohttp_client import async_get_clientsession  # type: ignore
 from homeassistant.helpers.selector import (  # type: ignore
     SelectSelector,
     SelectSelectorConfig,
@@ -30,35 +33,122 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 
-async def validate_input(hass: HomeAssistant, data: Dict[str, Any]) -> Dict[str, Any]:
-    """Validate the user input allows us to connect."""
-    # Test radiation API endpoint if station is provided
-    session = async_get_clientsession(hass)
+class CannotConnect(Exception):
+    """Error to indicate invalid configuration."""
 
-    if data.get(CONF_STATION):
-        try:
-            url = f"https://karttjanst.ssm.se/data/getHistoryForStation?locationId={data[CONF_STATION]}&start=0&end=1"
-            async with session.get(url) as response:
-                if response.status != 200:
-                    raise Exception(f"Radiation API returned status {response.status}")
-        except Exception as e:
-            _LOGGER.error("Error validating Radiation API: %s", e)
-            raise
 
-    # Validate the UV index endpoint if location is provided
-    if data.get(CONF_LOCATION):
-        try:
-            location = data[CONF_LOCATION].replace(" ", "%20")
-            url = f"https://www.stralsakerhetsmyndigheten.se/api/uvindex/{location}?offset=-1"
-            async with session.get(url) as response:
-                if response.status != 200:
-                    raise Exception(f"UV Index API returned status {response.status}")
-        except Exception as e:
-            _LOGGER.error("Error validating UV Index API: %s", e)
-            raise
+def _get_api_location_name(location_id: str) -> str | None:
+    """Get the API location name for a given location ID."""
+    location = next((loc for loc in LOCATIONS if loc["id"] == location_id), None)
+    return location["api_name"] if location else None
 
-    # Return validated data
+
+async def validate_input(
+    _hass: HomeAssistant,
+    data: dict[str, Any],
+) -> dict[str, Any]:
+    """Validate the user input.
+
+    Only validate local selector values during setup. Do not block setup on
+    transient SSM API failures; sensors will become unavailable if polling fails.
+    """
+    if data.get(CONF_STATION) and not any(
+        station["id"] == data[CONF_STATION] for station in STATIONS
+    ):
+        raise CannotConnect
+
+    if data.get(CONF_LOCATION) and _get_api_location_name(data[CONF_LOCATION]) is None:
+        raise CannotConnect
+
+    if data.get(CONF_SKIN_TYPE) and not any(
+        skin_type["id"] == data[CONF_SKIN_TYPE] for skin_type in SKIN_TYPES
+    ):
+        raise CannotConnect
+
     return {"title": data[CONF_NAME]}
+
+
+def _station_options() -> list[dict[str, str]]:
+    """Return station selector options."""
+    return [
+        {"value": station["id"], "label": station["name"]}
+        for station in STATIONS
+    ]
+
+
+def _location_options() -> list[dict[str, str]]:
+    """Return location selector options."""
+    return [
+        {"value": location["id"], "label": location["name"]}
+        for location in LOCATIONS
+    ]
+
+
+def _skin_type_options() -> list[dict[str, str]]:
+    """Return skin type selector options."""
+    return [
+        {"value": skin_type["id"], "label": skin_type["name"]}
+        for skin_type in SKIN_TYPES
+    ]
+
+
+def _config_schema() -> vol.Schema:
+    """Return the config flow schema."""
+    return vol.Schema(
+        {
+            vol.Required(CONF_NAME, default=DEFAULT_NAME): str,
+            vol.Optional(CONF_STATION): SelectSelector(
+                SelectSelectorConfig(
+                    options=_station_options(),
+                    translation_key="station",
+                    mode="dropdown",
+                )
+            ),
+            vol.Optional(CONF_LOCATION): SelectSelector(
+                SelectSelectorConfig(
+                    options=_location_options(),
+                    translation_key="location",
+                    mode="dropdown",
+                )
+            ),
+            vol.Optional(CONF_SKIN_TYPE): SelectSelector(
+                SelectSelectorConfig(
+                    options=_skin_type_options(),
+                    translation_key="skin_type",
+                    mode="dropdown",
+                )
+            ),
+        }
+    )
+
+
+def _options_schema() -> vol.Schema:
+    """Return the options flow schema."""
+    return vol.Schema(
+        {
+            vol.Optional(CONF_STATION): SelectSelector(
+                SelectSelectorConfig(
+                    options=_station_options(),
+                    translation_key="station",
+                    mode="dropdown",
+                )
+            ),
+            vol.Optional(CONF_LOCATION): SelectSelector(
+                SelectSelectorConfig(
+                    options=_location_options(),
+                    translation_key="location",
+                    mode="dropdown",
+                )
+            ),
+            vol.Optional(CONF_SKIN_TYPE): SelectSelector(
+                SelectSelectorConfig(
+                    options=_skin_type_options(),
+                    translation_key="skin_type",
+                    mode="dropdown",
+                )
+            ),
+        }
+    )
 
 
 class SSMConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
@@ -68,15 +158,29 @@ class SSMConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
     MINOR_VERSION = 1
     CONNECTION_CLASS = config_entries.CONN_CLASS_CLOUD_POLL
 
-    async def async_step_user(self, user_input=None):
+    async def async_step_user(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> ConfigFlowResult:
         """Handle the initial step."""
-        errors = {}
+        errors: dict[str, str] = {}
 
         if user_input is not None:
             try:
                 info = await validate_input(self.hass, user_input)
-
-                # Generate a UUID-based unique ID
+            except CannotConnect:
+                _LOGGER.debug(
+                    "Invalid SSM configuration input: %s",
+                    user_input,
+                    exc_info=True,
+                )
+                errors["base"] = "cannot_connect"
+            except Exception:
+                _LOGGER.exception("Unexpected exception validating input")
+                errors["base"] = "unknown"
+            else:
+                # This UUID keeps each entry unique, but it does not prevent duplicate
+                # entries with the same selected station/location.
                 unique_id = str(uuid.uuid4())
                 await self.async_set_unique_id(unique_id)
                 self._abort_if_unique_id_configured()
@@ -85,132 +189,64 @@ class SSMConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[c
                     title=info["title"],
                     data=user_input,
                 )
-            except Exception:
-                _LOGGER.debug("Failed user input: %s", user_input, exc_info=True)
-                errors["base"] = "unknown"
-
-        # Create dropdown options for location ID
-        station_options = [
-            {"value": station["id"], "label": station["name"]} for station in STATIONS
-        ]
-
-        # Create dropdown options for UV locations
-        location_options = [
-            {"value": location["id"], "label": location["name"]}
-            for location in LOCATIONS
-        ]
-
-        # Create dropdown options for skin type
-        skin_type_options = [
-            {"value": skin_type["id"], "label": skin_type["name"]}
-            for skin_type in SKIN_TYPES
-        ]
-
-        # Provide a form for user input
-        data_schema = vol.Schema(
-            {
-                vol.Required(CONF_NAME, default=DEFAULT_NAME): str,
-                vol.Optional(CONF_STATION): SelectSelector(
-                    SelectSelectorConfig(
-                        options=station_options,
-                        translation_key="station",
-                        mode="dropdown",
-                    )
-                ),
-                vol.Optional(CONF_LOCATION): SelectSelector(
-                    SelectSelectorConfig(
-                        options=location_options,
-                        translation_key="location",
-                        mode="dropdown",
-                    )
-                ),
-                vol.Optional(CONF_SKIN_TYPE): SelectSelector(
-                    SelectSelectorConfig(
-                        options=skin_type_options,
-                        translation_key="skin_type",
-                        mode="dropdown",
-                    )
-                ),
-            }
-        )
 
         return self.async_show_form(
-            step_id="user", data_schema=data_schema, errors=errors
+            step_id="user",
+            data_schema=_config_schema(),
+            errors=errors,
         )
 
     @staticmethod
     @callback
-    def async_get_options_flow(_config_entry):
-        """Get the options flow for this handler."""
+    def async_get_options_flow(
+        _config_entry: ConfigEntry,
+    ) -> config_entries.OptionsFlow:
+        """Create the options flow."""
         return SSMOptionsFlow()
 
 
-class SSMOptionsFlow(config_entries.OptionsFlow):
+class SSMOptionsFlow(config_entries.OptionsFlowWithReload):
     """Handle options for SSM integration."""
 
-    async def async_step_init(self, user_input=None):
+    async def async_step_init(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> ConfigFlowResult:
         """Manage the options."""
-        _LOGGER.debug("Options flow started")
-
         if user_input is not None:
-            _LOGGER.debug("User input received: %s", user_input)
-            # Remove empty fields to make them truly optional
-            cleaned_input = {k: v for k, v in user_input.items() if v not in (None, "")}
-            return self.async_create_entry(title="", data=cleaned_input)
+            cleaned_input = {
+                key: value
+                for key, value in user_input.items()
+                if value not in (None, "")
+            }
 
-        # Create dropdown options for location ID
-        station_options = [
-            {"value": station["id"], "label": station["name"]} for station in STATIONS
-        ]
+            return self.async_create_entry(data=cleaned_input)
 
-        # Create dropdown options for UV locations
-        location_options = [
-            {"value": location["id"], "label": location["name"]}
-            for location in LOCATIONS
-        ]
+        current_values = {
+            CONF_STATION: self.config_entry.options.get(
+                CONF_STATION,
+                self.config_entry.data.get(CONF_STATION),
+            ),
+            CONF_LOCATION: self.config_entry.options.get(
+                CONF_LOCATION,
+                self.config_entry.data.get(CONF_LOCATION),
+            ),
+            CONF_SKIN_TYPE: self.config_entry.options.get(
+                CONF_SKIN_TYPE,
+                self.config_entry.data.get(CONF_SKIN_TYPE),
+            ),
+        }
 
-        # Create dropdown options for skin type
-        skin_type_options = [
-            {"value": skin_type["id"], "label": skin_type["name"]}
-            for skin_type in SKIN_TYPES
-        ]
-
-        # Get current values from config or options
-        station = self.config_entry.options.get(
-            CONF_STATION, self.config_entry.data.get(CONF_STATION, "")
-        )
-        location = self.config_entry.options.get(
-            CONF_LOCATION, self.config_entry.data.get(CONF_LOCATION, "")
-        )
-        skin_type = self.config_entry.options.get(
-            CONF_SKIN_TYPE, self.config_entry.data.get(CONF_SKIN_TYPE, "")
-        )
+        current_values = {
+            key: value
+            for key, value in current_values.items()
+            if value not in (None, "")
+        }
 
         return self.async_show_form(
             step_id="init",
-            data_schema=vol.Schema(
-                {
-                    vol.Optional(CONF_STATION, default=station): SelectSelector(
-                        SelectSelectorConfig(
-                            options=station_options,
-                            translation_key="station",
-                            mode="dropdown",
-                        )
-                    ),
-                    vol.Optional(CONF_LOCATION, default=location): SelectSelector(
-                        SelectSelectorConfig(
-                            options=location_options,
-                            translation_key="location",
-                            mode="dropdown",
-                        )
-                    ),
-                    vol.Optional(CONF_SKIN_TYPE, default=skin_type): SelectSelector(
-                        SelectSelectorConfig(
-                            options=skin_type_options,
-                            translation_key="skin_type",
-                            mode="dropdown",
-                        )
-                    ),
-                }
+            data_schema=self.add_suggested_values_to_schema(
+                _options_schema(),
+                current_values,
             ),
         )

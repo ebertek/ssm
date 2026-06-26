@@ -8,31 +8,34 @@
         "data": {
           "name": "Név",
           "station": "Állomás a sugárzási adatokhoz",
-          "location": "Helység az UV-indexhez",
+          "location": "Hely az UV-indexhez",
           "skin_type": "Bőrtípus"
         }
       }
     },
     "error": {
-      "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
-      "invalid_auth": "[%key:common::config_flow::error::invalid_auth%]",
-      "unknown": "[%key:common::config_flow::error::unknown%]"
+      "cannot_connect": "A kiválasztott SSM-beállítás érvénytelen.",
+      "unknown": "Váratlan hiba történt."
     },
     "abort": {
-      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+      "already_configured": "Ez az SSM-beállítás már konfigurálva van."
     }
   },
   "options": {
     "step": {
       "init": {
         "title": "SSM integrációs beállítások",
-        "description": "Frissítsd a sugárzás- és UV-adatok figyelésének beállításait",
+        "description": "Frissítsd a sugárzás- és UV-adatok figyelésének beállításait.",
         "data": {
           "station": "Állomás a sugárzási adatokhoz",
-          "location": "Helység az UV-indexhez",
+          "location": "Hely az UV-indexhez",
           "skin_type": "Bőrtípus"
         }
       }
+    },
+    "error": {
+      "cannot_connect": "A kiválasztott SSM-beállítás érvénytelen.",
+      "unknown": "Váratlan hiba történt."
     }
   },
   "selector": {
@@ -111,22 +114,22 @@
         "name": "Napon tölthető idő",
         "state_attributes": {
           "shade_direct_sun": {
-            "name": "Közvetlen napfényben (szélesség)"
+            "name": "Közvetlen napfényben (szélesség alapján)"
           },
           "shade_partial": {
-            "name": "Részleges árnyékban (szélesség)"
+            "name": "Részleges árnyékban (szélesség alapján)"
           },
           "shade_full": {
-            "name": "Teljes árnyékban (szélesség)"
+            "name": "Teljes árnyékban (szélesség alapján)"
           },
           "i_shade_direct_sun": {
-            "name": "Közvetlen napfényben (index)"
+            "name": "Közvetlen napfényben (UV-index alapján)"
           },
           "i_shade_partial": {
-            "name": "Részleges árnyékban (index)"
+            "name": "Részleges árnyékban (UV-index alapján)"
           },
           "i_shade_full": {
-            "name": "Teljes árnyékban (index)"
+            "name": "Teljes árnyékban (UV-index alapján)"
           },
           "last_updated": {
             "name": "Utoljára frissítve"
@@ -140,25 +143,25 @@
             "name": "Jelenlegi UV-index"
           },
           "max_uv_today": {
-            "name": "Mai UV-index"
+            "name": "Mai legmagasabb UV-index"
           },
           "max_uv_time": {
-            "name": "Legmagasabb UV-index időpontja"
+            "name": "A legmagasabb UV-index időpontja"
           },
           "max_uv_tomorrow": {
-            "name": "Holnapi UV-index"
+            "name": "Holnapi legmagasabb UV-index"
           },
           "hourly_forecast": {
-            "name": "Előjelzés"
+            "name": "Óránkénti előrejelzés"
           },
           "risk_level": {
-            "name": "Veszélyességi szint",
+            "name": "Kockázati szint",
             "state": {
               "extreme": "Extrém",
-              "very_high": "Nagyon erős",
-              "high": "Erős",
+              "very_high": "Nagyon magas",
+              "high": "Magas",
               "moderate": "Mérsékelt",
-              "low": "Gyenge",
+              "low": "Alacsony",
               "none": "Nincs"
             }
           },

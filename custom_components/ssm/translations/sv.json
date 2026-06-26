@@ -8,31 +8,34 @@
         "data": {
           "name": "Namn",
           "station": "Station för strålningsnivå",
-          "location": "Platsnamn för UV-index",
+          "location": "Plats för UV-index",
           "skin_type": "Hudtyp"
         }
       }
     },
     "error": {
-      "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
-      "invalid_auth": "[%key:common::config_flow::error::invalid_auth%]",
-      "unknown": "[%key:common::config_flow::error::unknown%]"
+      "cannot_connect": "Den valda SSM-konfigurationen är ogiltig.",
+      "unknown": "Ett oväntat fel inträffade."
     },
     "abort": {
-      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+      "already_configured": "Den här SSM-konfigurationen är redan konfigurerad."
     }
   },
   "options": {
     "step": {
       "init": {
         "title": "SSM-integrationsalternativ",
-        "description": "Uppdatera dina inställningar för strålning och UV-övervakning",
+        "description": "Uppdatera dina inställningar för strålnings- och UV-övervakning.",
         "data": {
           "station": "Station för strålningsnivå",
-          "location": "Platsnamn för UV-index",
+          "location": "Plats för UV-index",
           "skin_type": "Hudtyp"
         }
       }
+    },
+    "error": {
+      "cannot_connect": "Den valda SSM-konfigurationen är ogiltig.",
+      "unknown": "Ett oväntat fel inträffade."
     }
   },
   "selector": {
@@ -64,8 +67,8 @@
         "3": "Tännäs",
         "24": "Visingsö",
         "1277": "Växjö",
-        "23": "Ölands Norra Udde",
-        "13": "Ölands Södra Udde"
+        "23": "Ölands norra udde",
+        "13": "Ölands södra udde"
       }
     },
     "location": {
@@ -120,13 +123,13 @@
             "name": "I mycket skugga (latitud)"
           },
           "i_shade_direct_sun": {
-            "name": "I direkt solljus (index)"
+            "name": "I direkt solljus (UV-index)"
           },
           "i_shade_partial": {
-            "name": "I lite skugga (index)"
+            "name": "I lite skugga (UV-index)"
           },
           "i_shade_full": {
-            "name": "I mycket skugga (index)"
+            "name": "I mycket skugga (UV-index)"
           },
           "last_updated": {
             "name": "Senast uppdaterad"
@@ -140,26 +143,26 @@
             "name": "UV-index nu"
           },
           "max_uv_today": {
-            "name": "UV-index idag"
+            "name": "Högsta UV-index idag"
           },
           "max_uv_time": {
             "name": "Tid för högsta UV-index"
           },
           "max_uv_tomorrow": {
-            "name": "Maximal UV-index imorgon"
+            "name": "Högsta UV-index imorgon"
           },
           "hourly_forecast": {
-            "name": "Prognos"
+            "name": "Timprognos"
           },
           "risk_level": {
             "name": "Risknivå",
             "state": {
-              "extreme": "Extremt",
-              "very_high": "Mycket högt",
-              "high": "Högt",
-              "moderate": "Medelhögt",
-              "low": "Lågt",
-              "none": "Inget"
+              "extreme": "Extrem",
+              "very_high": "Mycket hög",
+              "high": "Hög",
+              "moderate": "Måttlig",
+              "low": "Låg",
+              "none": "Ingen"
             }
           },
           "last_updated": {
@@ -171,10 +174,10 @@
         "name": "Strålningsnivå",
         "state_attributes": {
           "min_level": {
-            "name": "Minsta nivå"
+            "name": "Lägsta nivå"
           },
           "max_level": {
-            "name": "Maximal nivå"
+            "name": "Högsta nivå"
           },
           "avg_level": {
             "name": "Genomsnittlig nivå"
