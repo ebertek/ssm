@@ -44,7 +44,6 @@ SCAN_INTERVAL = timedelta(minutes=30)
 STOCKHOLM_TIMEZONE = ZoneInfo("Europe/Stockholm")
 
 
-def _entry_string_value(
 async def async_setup_entry(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
@@ -175,7 +174,7 @@ class SSMRadiationSensor(SensorEntity):
         self._attr_native_value = None
         self._attr_available = True
         self._attr_device_info = _device_info(entry_id, name)
-        self._attr_extra_state_attributes = {
+        self._attr_extra_state_attributes: dict[str, Any] = {
             "min_level": None,
             "max_level": None,
             "avg_level": None,
@@ -262,7 +261,7 @@ class SSMRadiationSensor(SensorEntity):
 
                 if not valid_values:
                     _LOGGER.debug(
-                        "No valid numeric radiation values received from SSM Radiation API: %s",
+                        "No valid numeric radiation values from Radiation API: %s",
                         radiation_values,
                     )
                     continue
@@ -538,7 +537,9 @@ class SSMSunTimeSensor(SensorEntity):
         return int(round(float(current_uv)))
 
     @staticmethod
-    def _parse_safe_times(results: list[dict[str, Any]]) -> dict[str, int | float | None]:
+    def _parse_safe_times(
+        results: list[dict[str, Any]],
+    ) -> dict[str, int | float | None]:
         """Parse safe times from the SSM sun time API response."""
         safe_times: dict[str, int | float | None] = {
             "direkt solljus": None,
